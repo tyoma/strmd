@@ -35,8 +35,8 @@ namespace strmd
 	template <> struct is_arithmetic<unsigned short> { static const bool value = true; };
 	template <> struct is_arithmetic<int> { static const bool value = true; };
 	template <> struct is_arithmetic<unsigned int> { static const bool value = true; };
-	template <> struct is_arithmetic<long> { static const bool value = true; };
-	template <> struct is_arithmetic<unsigned long> { static const bool value = true; };
+//	template <> struct is_arithmetic<long> { static const bool value = true; };
+//	template <> struct is_arithmetic<unsigned long> { static const bool value = true; };
 	template <> struct is_arithmetic<long long> { static const bool value = true; };
 	template <> struct is_arithmetic<unsigned long long> { static const bool value = true; };
 	template <> struct is_arithmetic<float> { static const bool value = true; };
