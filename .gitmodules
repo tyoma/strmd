@@ -1,3 +1,4 @@
 [submodule "libraries/utee"]
 	path = libraries/utee
-	url = git@github.com:tyoma/utee.git
+	url = ../utee.git
+	branch = master
