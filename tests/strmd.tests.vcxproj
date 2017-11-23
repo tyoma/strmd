@@ -36,12 +36,19 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="SerializerTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)..\libraries\utee\make\utee.vcxproj">
       <Project>{4db73ace-2d47-4a6c-8213-2be191dd921f}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\strmd\deserializer.h" />
+    <ClInclude Include="..\strmd\serializer.h" />
+    <ClInclude Include="..\strmd\type_traits.h" />
+    <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

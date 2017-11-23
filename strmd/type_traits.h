@@ -47,4 +47,43 @@ namespace strmd
 	template <typename T> struct is_container< std::basic_string<T> > { static const bool value = true; };
 	template <typename T> struct is_container< std::vector<T> > { static const bool value = true; };
 	template <typename KeyT, typename ValueT> struct is_container< std::unordered_map<KeyT, ValueT> > { static const bool value = true; };
+
+
+	template <bool enable>
+	struct process_as_arithmetic
+	{
+		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
+	};
+
+	template <>
+	struct process_as_arithmetic<true>
+	{
+		template <typename ArchiveT, typename T> static void process(ArchiveT &s, T &data) { s.process_arithmetic(data); }
+	};
+
+
+	template <bool enable>
+	struct process_as_container
+	{
+		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
+	};
+
+	template <>
+	struct process_as_container<true>
+	{
+		template <typename ArchiveT, typename T> static void process(ArchiveT &s, T &data) { s.process_container(data); }
+	};
+
+
+	template <bool enable>
+	struct process_as_regular
+	{
+		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
+	};
+
+	template <>
+	struct process_as_regular<true>
+	{
+		template <typename ArchiveT, typename T> static void process(ArchiveT &s, T &data) { s.process_regular(data); }
+	};
 }

@@ -1,9 +1,9 @@
 #include <strmd/serializer.h>
 
+#include "types.h"
+
 #include <ut/assert.h>
 #include <ut/test.h>
-
-namespace std {	namespace tr1 { } using namespace tr1;	}
 
 using namespace std;
 
@@ -32,47 +32,6 @@ namespace strmd
 			private:
 				vector<unsigned char> &_buffer;
 			};
-
-			struct A
-			{
-				int a;
-				unsigned char b;
-				string c;
-			};
-
-			struct B
-			{
-				unsigned char a;
-				unsigned char b;
-			};
-
-			struct C
-			{
-				unsigned char a;
-				unsigned char b;
-			};
-
-			template <typename ArchiveT>
-			void serialize(ArchiveT &archive, const A &v)
-			{
-				archive(v.a);
-				archive(v.b);
-				archive(v.c);
-			}
-
-			template <typename ArchiveT>
-			void serialize(ArchiveT &archive, const B &v)
-			{
-				archive(v.a);
-				archive(v.b);
-			}
-
-			template <typename ArchiveT>
-			void serialize(ArchiveT &archive, const C &v)
-			{
-				archive(v.b);
-				archive(v.a);
-			}
 		}
 
 		begin_test_suite( SerializerTests )
