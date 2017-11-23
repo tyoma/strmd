@@ -13,6 +13,26 @@ namespace strmd
 	{
 		namespace
 		{
+			class vector_writer
+			{
+			public:
+				vector_writer(vector<unsigned char> &buffer)
+					: _buffer(buffer)
+				{	}
+
+				void write(const void *data, size_t size)
+				{
+					_buffer.insert(_buffer.end(), static_cast<const unsigned char *>(data),
+						static_cast<const unsigned char *>(data)+size);
+				}
+
+			private:
+				void operator =(const vector_writer &other);
+
+			private:
+				vector<unsigned char> &_buffer;
+			};
+
 			struct A
 			{
 				int a;
@@ -62,7 +82,7 @@ namespace strmd
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 				A data[] = { { 123456, 12, "lorem ipsum" }, { -2123456, 128, "amet dolor" }, };
 				
 				// ACT / ASSERT (must compile)
@@ -71,23 +91,11 @@ namespace strmd
 			}
 
 			
-			//test( DeserializationStructure )
-			//{
-			//	// INIT
-			//	vector_reader r(buffer);
-			//	deserializer d(r);
-			//	A data;
-
-			//	// ACT / ASSERT
-			//	assert_throws(d(data), runtime_error);
-			//}
-
-
 			test( TrivialStructuresAreSerializedAccordinglyToSchema )
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 				B b = { 0x01, 0x02 };
 				C c = { 0x01, 0x02 };
 
@@ -118,7 +126,7 @@ namespace strmd
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 				string str;
 
 				// ACT
@@ -146,7 +154,7 @@ namespace strmd
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 				short b[] = { 1232, -322, 11, 1, };
 				unsigned int c[] = { 2100111, 3, };
 				vector<short> vs(b, b + 4);
@@ -186,7 +194,7 @@ namespace strmd
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 				B b[] = { { 1, 2 }, { 54, 17 }, };
 				C c[] = { { 1, 2 }, { 54, 17 }, { 17, 21 } };
 				vector<B> vb(b, b + 2);
@@ -222,7 +230,7 @@ namespace strmd
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 				B b[] = { { 1, 2 }, { 54, 17 }, };
 				C c[] = { { 1, 2 }, { 17, 21 } };
 				pair<B, C> p1[] = {	make_pair(b[0], c[0]), make_pair(b[1], c[1]),	};
@@ -257,7 +265,7 @@ namespace strmd
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 
 				// ACT
 				s(static_cast<char>(-1));
@@ -290,7 +298,7 @@ namespace strmd
 			{
 				// INIT
 				vector_writer w(buffer);
-				serializer s(w);
+				serializer<vector_writer> s(w);
 				unordered_map<int, B> mib;
 				B b[] = { { 1, 2 }, { 54, 17 }, };
 
