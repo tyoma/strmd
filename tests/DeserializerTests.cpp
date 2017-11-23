@@ -184,6 +184,96 @@ namespace strmd
 			}
 
 
+			test( AssociativeContainerDeserialization )
+			{
+				unsigned char buffer[] = {
+					0x03, 0x00, 0x00, 0x00,
+					'a', 0x10, 0x13, 'c', 0x00, 0x10, 'Z', 0x30, 0x00,
+					0x02, 0x00, 0x00, 0x00,
+					0x34, 0x12, 0x00, 0x00, 0x10, 0x11, 0x43, 0x21, 0x10, 0x00, 0x00, 0x11,
+				};
+				vector_reader r(buffer);
+				deserializer<vector_reader> d(r);
+				unordered_map<char, unsigned short> ucus;
+				unordered_map<unsigned short, int> uusi;
+
+				// ACT
+				d(ucus);
+				d(uusi);
+
+				// ASSERT
+				pair<char, unsigned short> reference1[] = {
+					make_pair('a', 0x1310), make_pair('c', 0x1000), make_pair('Z', 0x0030),
+				};
+				pair<unsigned short, int> reference2[] = {
+					make_pair(0x1234, 0x11100000), make_pair(0x2143, 0x11000010),
+				};
+
+				assert_equivalent(reference1, (vector< pair<char, unsigned short> >(ucus.begin(), ucus.end())));
+				assert_equivalent(reference2, (vector< pair<unsigned short, int> >(uusi.begin(), uusi.end())));
+			}
+
+
+			test( ContainersAreClearedOnBeforeDeserialize )
+			{
+				// INIT
+				unsigned char buffer[] = {
+					0x00, 0x00, 0x00, 0x00,
+					0x00, 0x00, 0x00, 0x00,
+				};
+				vector_reader r(buffer);
+				deserializer<vector_reader> d(r);
+				unordered_map<char, unsigned short> ucus;
+				vector<unsigned short> vs(4);
+
+				ucus[3] = 22;
+
+				// ACT
+				d(ucus);
+				d(vs);
+
+				// ASSERT
+				assert_is_empty(ucus);
+				assert_is_empty(vs);
+			}
+
+
+			test( ComplexTypesAreDeserializedAsExpected )
+			{
+				// INIT
+				unsigned char buffer[] = {
+					0x78, 0x56, 0x34, 0x12, 0xF9,
+					0x05, 0x00, 0x00, 0x00, 'l', 'o', 'r', 'e', 'm',
+					0x21, 0x43, 0x65, 0x77, 0x1B,
+					0x03, 0x00, 0x00, 0x00, 'T', 'h', 'e',
+					0x67, 0x61,
+				};
+				vector_reader r(buffer);
+				deserializer<vector_reader> d(r);
+				A a;
+				C c;
+
+				// ACT
+				d(a);
+
+				// ASSERT
+				assert_equal(0x12345678, a.a);
+				assert_equal(0xF9, a.b);
+				assert_equal("lorem", a.c);
+
+				// ACT
+				d(a);
+				d(c);
+
+				// ASSERT
+				assert_equal(0x77654321, a.a);
+				assert_equal(0x1B, a.b);
+				assert_equal("The", a.c);
+				assert_equal(0x61, c.a);
+				assert_equal(0x67, c.b);
+			}
+
+
 		end_test_suite
 	}
 }

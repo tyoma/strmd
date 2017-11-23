@@ -30,13 +30,13 @@ namespace strmd
 
 	private:
 		template <bool enable>
-		friend struct process_as_arithmetic;
+		friend struct as_arithmetic;
 
 		template <bool enable>
-		friend struct process_as_container;
+		friend struct as_container;
 
 		template <bool enable>
-		friend struct process_as_regular;
+		friend struct as_regular;
 	};
 
 
@@ -49,9 +49,9 @@ namespace strmd
 	template <typename T>
 	inline void serializer<StreamT>::operator ()(const T &data)
 	{
-		process_as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
-		process_as_container<is_container<T>::value>::process(*this, data);
-		process_as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data);
+		as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
+		as_container<is_container<T>::value>::process(*this, data);
+		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data);
 	}
 
 	template <typename StreamT>
@@ -72,12 +72,4 @@ namespace strmd
 	template <typename T>
 	inline void serializer<StreamT>::process_regular(const T &data)
 	{	serialize(*this, const_cast<T &>(data));	}
-
-
-	template <typename ArchiveT, typename T1, typename T2>
-	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data)
-	{
-		archive(data.first);
-		archive(data.second);
-	}
 }

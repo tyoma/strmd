@@ -20,6 +20,9 @@ namespace strmd
 		template <typename T>
 		void process_container(T &data);
 
+		template <typename T>
+		void process_regular(T &data);
+
 		void operator =(const deserializer &other);
 
 	private:
@@ -27,13 +30,47 @@ namespace strmd
 
 	private:
 		template <bool enable>
-		friend struct process_as_arithmetic;
+		friend struct as_arithmetic;
 
 		template <bool enable>
-		friend struct process_as_container;
+		friend struct as_container;
 
 		template <bool enable>
-		friend struct process_as_regular;
+		friend struct as_regular;
+	};
+
+	template <typename ContainerT>
+	struct container_reader
+	{
+		template <typename ArchiveT>
+		void operator()(ArchiveT &archive, size_t count, ContainerT &data)
+		{
+			typename ContainerT::value_type value;
+
+			data.clear();
+			while (count--)
+			{
+				archive(value);
+				data.push_back(value);
+			}
+		}
+	};
+
+	template <typename KeyT, typename ValueT>
+	struct container_reader< std::unordered_map<KeyT, ValueT> >
+	{
+		template <typename ArchiveT>
+		void operator()(ArchiveT &archive, size_t count, std::unordered_map<KeyT, ValueT> &data)
+		{
+			std::pair<KeyT, ValueT> value;
+
+			data.clear();
+			while (count--)
+			{
+				archive(value);
+				data.insert(value);
+			}
+		}
 	};
 
 
@@ -47,8 +84,9 @@ namespace strmd
 	template <typename T>
 	inline void deserializer<StreamT>::operator ()(T &data)
 	{
-		process_as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
-		process_as_container<is_container<T>::value>::process(*this, data);
+		as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
+		as_container<is_container<T>::value>::process(*this, data);
+		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data);
 	}
 
 	template <typename StreamT>
@@ -61,13 +99,14 @@ namespace strmd
 	inline void deserializer<StreamT>::process_container(T &data)
 	{
 		unsigned int size;
-		typename T::value_type value;
+		container_reader<T> reader;
 
 		(*this)(size);
-		while (size--)
-		{
-			(*this)(value);
-			data.push_back(value);
-		}
+		reader(*this, size, data);
 	}
+
+	template <typename StreamT>
+	template <typename T>
+	inline void deserializer<StreamT>::process_regular(T &data)
+	{	serialize(*this, data);	}
 }

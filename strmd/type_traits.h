@@ -50,40 +50,48 @@ namespace strmd
 
 
 	template <bool enable>
-	struct process_as_arithmetic
+	struct as_arithmetic
 	{
 		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
 	};
 
 	template <>
-	struct process_as_arithmetic<true>
+	struct as_arithmetic<true>
 	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &s, T &data) { s.process_arithmetic(data); }
+		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_arithmetic(data); }
 	};
 
 
 	template <bool enable>
-	struct process_as_container
+	struct as_container
 	{
 		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
 	};
 
 	template <>
-	struct process_as_container<true>
+	struct as_container<true>
 	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &s, T &data) { s.process_container(data); }
+		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_container(data); }
 	};
 
 
 	template <bool enable>
-	struct process_as_regular
+	struct as_regular
 	{
 		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
 	};
 
 	template <>
-	struct process_as_regular<true>
+	struct as_regular<true>
 	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &s, T &data) { s.process_regular(data); }
+		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_regular(data); }
 	};
+
+
+	template <typename ArchiveT, typename T1, typename T2>
+	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data)
+	{
+		archive(data.first);
+		archive(data.second);
+	}
 }
