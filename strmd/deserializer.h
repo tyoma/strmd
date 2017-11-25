@@ -56,11 +56,11 @@ namespace strmd
 		}
 	};
 
-	template <typename KeyT, typename ValueT>
-	struct container_reader< std::unordered_map<KeyT, ValueT> >
+	template <typename KeyT, typename ValueT, typename CompT>
+	struct container_reader< std::unordered_map<KeyT, ValueT, CompT> >
 	{
 		template <typename ArchiveT>
-		void operator()(ArchiveT &archive, size_t count, std::unordered_map<KeyT, ValueT> &data)
+		void operator()(ArchiveT &archive, size_t count, std::unordered_map<KeyT, ValueT, CompT> &data)
 		{
 			std::pair<KeyT, ValueT> value;
 

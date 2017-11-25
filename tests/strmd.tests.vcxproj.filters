@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="SerializerTests.cpp" />
     <ClCompile Include="DeserializerTests.cpp" />
+    <ClCompile Include="TypeTraitsTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library Headers">

@@ -6,6 +6,7 @@ set(STRMD_TEST_SOURCES
 	main.cpp
 	DeserializerTests.cpp
 	SerializerTests.cpp
+	TypeTraitsTests.cpp
 )
 
 add_executable(strmd.tests ${STRMD_TEST_SOURCES})

@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="SerializerTests.cpp" />
+    <ClCompile Include="TypeTraitsTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\strmd\deserializer.h" />

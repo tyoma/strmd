@@ -46,7 +46,7 @@ namespace strmd
 	template <typename T> struct is_container { static const bool value = false; };
 	template <typename T> struct is_container< std::basic_string<T> > { static const bool value = true; };
 	template <typename T> struct is_container< std::vector<T> > { static const bool value = true; };
-	template <typename KeyT, typename ValueT> struct is_container< std::unordered_map<KeyT, ValueT> > { static const bool value = true; };
+	template <typename KeyT, typename ValueT, typename CompT> struct is_container< std::unordered_map<KeyT, ValueT, CompT> > { static const bool value = true; };
 
 
 	template <bool enable>

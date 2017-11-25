@@ -14,6 +14,13 @@ namespace strmd
 	{
 		namespace
 		{
+			struct custom_hash
+			{
+				template <typename T>
+				size_t operator ()(const T &value) const
+				{	return hash<T>()(value);	}
+			};
+
 			class vector_reader
 			{
 			public:
@@ -195,7 +202,7 @@ namespace strmd
 				vector_reader r(buffer);
 				deserializer<vector_reader> d(r);
 				unordered_map<char, unsigned short> ucus;
-				unordered_map<unsigned short, int> uusi;
+				unordered_map<unsigned short, int, custom_hash> uusi;
 
 				// ACT
 				d(ucus);
