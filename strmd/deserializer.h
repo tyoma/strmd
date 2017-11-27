@@ -13,30 +13,20 @@ namespace strmd
 		template <typename T>
 		void operator ()(T &data);
 
-	private:
 		template <typename T>
 		void process_arithmetic(T &data);
 
 		template <typename T>
-		void process_container(T &data);
+		size_t process_container(T &data);
 
 		template <typename T>
 		void process_regular(T &data);
 
+	private:
 		void operator =(const deserializer &other);
 
 	private:
 		StreamT &_reader;
-
-	private:
-		template <bool enable>
-		friend struct as_arithmetic;
-
-		template <bool enable>
-		friend struct as_container;
-
-		template <bool enable>
-		friend struct as_regular;
 	};
 
 	template <typename ContainerT>
@@ -96,13 +86,14 @@ namespace strmd
 
 	template <typename StreamT>
 	template <typename T>
-	inline void deserializer<StreamT>::process_container(T &data)
+	inline size_t deserializer<StreamT>::process_container(T &data)
 	{
 		unsigned int size;
 		container_reader<T> reader;
 
 		(*this)(size);
 		reader(*this, size, data);
+		return size;
 	}
 
 	template <typename StreamT>

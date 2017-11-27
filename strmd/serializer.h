@@ -13,7 +13,6 @@ namespace strmd
 		template <typename T>
 		void operator ()(const T &data);
 
-	private:
 		template <typename T>
 		void process_arithmetic(T data);
 
@@ -23,20 +22,11 @@ namespace strmd
 		template <typename T>
 		void process_regular(const T &data);
 
+	private:
 		void operator =(const serializer &other);
 
 	private:
 		StreamT &_writer;
-
-	private:
-		template <bool enable>
-		friend struct as_arithmetic;
-
-		template <bool enable>
-		friend struct as_container;
-
-		template <bool enable>
-		friend struct as_regular;
 	};
 
 

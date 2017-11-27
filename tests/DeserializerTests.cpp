@@ -221,6 +221,36 @@ namespace strmd
 			}
 
 
+			test( ContainersCanBeReadViaProcessMethodAndSizeIsReturned )
+			{
+				unsigned char buffer[] = {
+					0x03, 0x00, 0x00, 0x00,
+					'a', 0x10, 0x13, 'c', 0x00, 0x10, 'Z', 0x30, 0x00,
+					0x02, 0x00, 0x00, 0x00,
+					0x34, 0x11, 0x12, 0x30
+				};
+				vector_reader r(buffer);
+				deserializer<vector_reader> d(r);
+				unordered_map<char, unsigned short> ucus;
+				vector<unsigned short> vus;
+
+				// ACT / ASSERT
+				assert_equal(3u, d.process_container(ucus));
+				assert_equal(2u, d.process_container(vus));
+
+				// ASSERT
+				pair<char, unsigned short> reference1[] = {
+					make_pair('a', 0x1310), make_pair('c', 0x1000), make_pair('Z', 0x0030),
+				};
+				unsigned short reference2[] = {
+					0x1134, 0x3012,
+				};
+
+				assert_equivalent(reference1, (vector< pair<char, unsigned short> >(ucus.begin(), ucus.end())));
+				assert_equivalent(reference2, vus);
+			}
+
+
 			test( ContainersAreClearedOnBeforeDeserialize )
 			{
 				// INIT
