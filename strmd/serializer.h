@@ -1,10 +1,11 @@
 #pragma once
 
+#include "packer.h"
 #include "type_traits.h"
 
 namespace strmd
 {
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT = direct>
 	class serializer
 	{
 	public:
@@ -30,36 +31,36 @@ namespace strmd
 	};
 
 
-	template <typename StreamT>
-	inline serializer<StreamT>::serializer(StreamT &stream)
+	template <typename StreamT, typename PackerT>
+	inline serializer<StreamT, PackerT>::serializer(StreamT &stream)
 		: _stream(stream)
 	{	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void serializer<StreamT>::operator ()(const T &data)
+	inline void serializer<StreamT, PackerT>::operator ()(const T &data)
 	{
 		as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
 		as_container<is_container<T>::value>::process(*this, data);
 		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data);
 	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void serializer<StreamT>::process_arithmetic(T data)
-	{	_stream.write(&data, sizeof(data));	}
+	inline void serializer<StreamT, PackerT>::process_arithmetic(T data)
+	{	PackerT::pack(_stream, data);	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename ContainerT>
-	inline void serializer<StreamT>::process_container(const ContainerT &data)
+	inline void serializer<StreamT, PackerT>::process_container(const ContainerT &data)
 	{
 		(*this)(static_cast<const unsigned int>(data.size()));
 		for (typename ContainerT::const_iterator i = data.begin(); i != data.end(); ++i)
 			(*this)(*i);
 	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void serializer<StreamT>::process_regular(const T &data)
+	inline void serializer<StreamT, PackerT>::process_regular(const T &data)
 	{	serialize(*this, const_cast<T &>(data));	}
 }

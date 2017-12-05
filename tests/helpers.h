@@ -38,7 +38,7 @@ namespace strmd
 
 			void read(void *data, size_t size)
 			{
-				assert_is_true(size <= _remaining);
+//				assert_is_true(size <= _remaining);
 				std::memcpy(data, _ptr, size);
 				_ptr += size;
 				_remaining -= size;

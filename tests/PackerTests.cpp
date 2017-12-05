@@ -308,6 +308,68 @@ namespace strmd
 				assert_equal(0x4C12u, ul);
 				assert_equal(0xFF0000000000u, ull);
 			}
+
+
+			test( SingleByteSignedValuesAreProperlyRetrieved )
+			{
+				// INIT
+				unsigned char buffer[] = {
+					0x18 | varint::terminator,
+					0x79 | varint::terminator,
+					0x5B | varint::terminator,
+					0x4C | varint::terminator,
+					0x7F | varint::terminator,
+				};
+				buffer_reader stream(buffer);
+				signed char sc = 1;
+				signed short ss = 1;
+				signed int si = 1;
+				signed long int sl = 1;
+				signed long long int sll = 1;
+
+				// ACT
+				varint::unpack(stream, sc);
+
+				// ASSERT
+				assert_equal(0x0C, sc);
+
+				// ACT
+				varint::unpack(stream, ss);
+				varint::unpack(stream, si);
+				varint::unpack(stream, sl);
+				varint::unpack(stream, sll);
+
+				// ASSERT
+				assert_equal(-0x3D, ss);
+				assert_equal(-0x2E, si);
+				assert_equal(0x26, sl);
+				assert_equal(-0x40, sll);
+			}
+
+
+			test( MultiByteSignedValuesAreProperlyRetrieved )
+			{
+				// INIT
+				unsigned char buffer[] = {
+					0x7F, 0x7F, 0x07 | varint::terminator,
+					0x7F, 0x7F, 0x7F, 0x7F, 0x0F | varint::terminator,
+					0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x01 | varint::terminator,
+				};
+				buffer_reader stream(buffer);
+				signed int si;
+				signed long int sl;
+				signed long long int sll;
+
+				// ACT
+				varint::unpack(stream, si);
+				varint::unpack(stream, sl);
+				varint::unpack(stream, sll);
+
+				// ASSERT
+				assert_equal(-65536, si);
+				assert_equal(numeric_limits<int>::min(), sl);
+				assert_equal(numeric_limits<long long>::min(), sll);
+			}
 		end_test_suite
 	}
 }

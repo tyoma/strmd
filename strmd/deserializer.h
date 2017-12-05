@@ -1,10 +1,11 @@
 #pragma once
 
+#include "packer.h"
 #include "type_traits.h"
 
 namespace strmd
 {
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT = direct>
 	class deserializer
 	{
 	public:
@@ -65,28 +66,28 @@ namespace strmd
 
 
 
-	template <typename StreamT>
-	inline deserializer<StreamT>::deserializer(StreamT &stream)
+	template <typename StreamT, typename PackerT>
+	inline deserializer<StreamT, PackerT>::deserializer(StreamT &stream)
 		: _stream(stream)
 	{	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void deserializer<StreamT>::operator ()(T &data)
+	inline void deserializer<StreamT, PackerT>::operator ()(T &data)
 	{
 		as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
 		as_container<is_container<T>::value>::process(*this, data);
 		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data);
 	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void deserializer<StreamT>::process_arithmetic(T &data)
-	{	_stream.read(&data, sizeof(T));	}
+	inline void deserializer<StreamT, PackerT>::process_arithmetic(T &data)
+	{	PackerT::unpack(_stream, data);	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline size_t deserializer<StreamT>::process_container(T &data)
+	inline size_t deserializer<StreamT, PackerT>::process_container(T &data)
 	{
 		unsigned int size;
 		container_reader<T> reader;
@@ -96,8 +97,8 @@ namespace strmd
 		return size;
 	}
 
-	template <typename StreamT>
+	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void deserializer<StreamT>::process_regular(T &data)
+	inline void deserializer<StreamT, PackerT>::process_regular(T &data)
 	{	serialize(*this, data);	}
 }
