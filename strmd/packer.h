@@ -13,6 +13,7 @@ namespace strmd
 	public:
 		enum {
 			bits_per_byte = 7,
+
 			terminator = 1 << bits_per_byte,
 			mask = terminator - 1
 		};
@@ -28,9 +29,17 @@ namespace strmd
 		}
 
 		template <typename StreamT, typename T>
-		static void unpack(StreamT &/*stream*/, T &value)
+		static void unpack(StreamT &stream, T &value)
 		{
+			unsigned char b, shift = 0;
+
 			value = 0;
+			do
+			{
+				stream.read(&b, 1);
+				value += static_cast<T>(b & mask) << shift;
+				shift += bits_per_byte;
+			} while (!(b & terminator));
 		}
 
 	private:

@@ -234,6 +234,80 @@ namespace strmd
 				assert_equal(0u, ul);
 				assert_equal(0u, ull);
 			}
+
+
+			test( SingleByteValuesAreExtractedWithTerminatorRemoved )
+			{
+				// INIT
+				unsigned char buffer[] = {
+					0x18 | varint::terminator,
+					0x79 | varint::terminator,
+					0x5B | varint::terminator,
+					0x4C | varint::terminator,
+					0x7F | varint::terminator,
+				};
+				buffer_reader stream(buffer);
+				unsigned char uc = 1;
+				unsigned short us = 1;
+				unsigned int ui = 1;
+				unsigned long int ul = 1;
+				unsigned long long int ull = 1;
+
+				// ACT
+				varint::unpack(stream, uc);
+
+				// ASSERT
+				assert_equal(0x18u, uc);
+
+				// ACT
+				varint::unpack(stream, us);
+				varint::unpack(stream, ui);
+				varint::unpack(stream, ul);
+				varint::unpack(stream, ull);
+
+				// ASSERT
+				assert_equal(0x79u, us);
+				assert_equal(0x5Bu, ui);
+				assert_equal(0x4Cu, ul);
+				assert_equal(0x7Fu, ull);
+			}
+
+
+			test( MultiByteValuesAreExtracted )
+			{
+				// INIT
+				unsigned char buffer[] = {
+					0x1D, 0x01 | varint::terminator,
+					0x1D, 0x03 | varint::terminator,
+					0x50, 0x79, 0x16 | varint::terminator,
+					0x12, 0x18, 0x01 | varint::terminator,
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x3F | varint::terminator,
+				};
+				buffer_reader stream(buffer);
+				unsigned char uc = 1;
+				unsigned short us = 1;
+				unsigned int ui = 1;
+				unsigned long int ul = 1;
+				unsigned long long int ull = 1;
+
+				// ACT
+				varint::unpack(stream, uc);
+
+				// ASSERT
+				assert_equal(0x9Du, uc);
+
+				// ACT
+				varint::unpack(stream, us);
+				varint::unpack(stream, ui);
+				varint::unpack(stream, ul);
+				varint::unpack(stream, ull);
+
+				// ASSERT
+				assert_equal(0x019Du, us);
+				assert_equal(0x05BCD0u, ui);
+				assert_equal(0x4C12u, ul);
+				assert_equal(0xFF0000000000u, ull);
+			}
 		end_test_suite
 	}
 }

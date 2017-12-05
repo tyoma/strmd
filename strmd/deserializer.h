@@ -30,7 +30,7 @@ namespace strmd
 	};
 
 	template <typename ContainerT>
-	struct container_stream
+	struct container_reader
 	{
 		template <typename ArchiveT>
 		void operator()(ArchiveT &archive, size_t count, ContainerT &data)
@@ -47,7 +47,7 @@ namespace strmd
 	};
 
 	template <typename KeyT, typename ValueT, typename CompT>
-	struct container_stream< std::unordered_map<KeyT, ValueT, CompT> >
+	struct container_reader< std::unordered_map<KeyT, ValueT, CompT> >
 	{
 		template <typename ArchiveT>
 		void operator()(ArchiveT &archive, size_t count, std::unordered_map<KeyT, ValueT, CompT> &data)
@@ -89,10 +89,10 @@ namespace strmd
 	inline size_t deserializer<StreamT>::process_container(T &data)
 	{
 		unsigned int size;
-		container_stream<T> stream;
+		container_reader<T> reader;
 
 		(*this)(size);
-		stream(*this, size, data);
+		reader(*this, size, data);
 		return size;
 	}
 
