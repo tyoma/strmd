@@ -1,5 +1,6 @@
 #include <strmd/deserializer.h>
 
+#include "helpers.h"
 #include "types.h"
 
 #include <cstring>
@@ -20,27 +21,6 @@ namespace strmd
 				size_t operator ()(const T &value) const
 				{	return hash<T>()(value);	}
 			};
-
-			class vector_reader
-			{
-			public:
-				template <size_t N>
-				vector_reader(unsigned char (&p)[N])
-					: _ptr(p), _remaining(N)
-				{	}
-
-				void read(void *data, size_t size)
-				{
-					assert_is_true(size <= _remaining);
-					memcpy(data, _ptr, size);
-					_ptr += size;
-					_remaining -= size;
-				}
-
-			private:
-				const unsigned char *_ptr;
-				size_t _remaining;
-			};
 		}
 
 		begin_test_suite( DeserializerTests )
@@ -48,8 +28,8 @@ namespace strmd
 			{
 				// INIT
 				unsigned char buffer[9] = { };
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				A data;
 
 				// ACT / ASSERT (must compile)
@@ -61,8 +41,8 @@ namespace strmd
 			{
 				// INIT
 				unsigned char buffer[42] = { };
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				char data_c = 1;
 				unsigned char data_uc = 1;
 				short data_si = 1;
@@ -104,8 +84,8 @@ namespace strmd
 			{
 				// INIT
 				unsigned char buffer[42] = { };
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				char data_c = 1;
 				unsigned char data_uc = 1;
 				short data_si = 1;
@@ -167,8 +147,8 @@ namespace strmd
 					0x0B, 0x00, 0x00, 0x00,
 					'i', 'p', 's', 'u', 'm', ' ', 'd', 'o', 'l', 'o', 'r',
 				};
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				vector<unsigned short> vs;
 				string str1;
 				string str2;
@@ -199,8 +179,8 @@ namespace strmd
 					0x02, 0x00, 0x00, 0x00,
 					0x34, 0x12, 0x00, 0x00, 0x10, 0x11, 0x43, 0x21, 0x10, 0x00, 0x00, 0x11,
 				};
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				unordered_map<char, unsigned short> ucus;
 				unordered_map<unsigned short, int, custom_hash> uusi;
 
@@ -229,8 +209,8 @@ namespace strmd
 					0x02, 0x00, 0x00, 0x00,
 					0x34, 0x11, 0x12, 0x30
 				};
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				unordered_map<char, unsigned short> ucus;
 				vector<unsigned short> vus;
 
@@ -258,8 +238,8 @@ namespace strmd
 					0x00, 0x00, 0x00, 0x00,
 					0x00, 0x00, 0x00, 0x00,
 				};
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				unordered_map<char, unsigned short> ucus;
 				vector<unsigned short> vs(4);
 
@@ -285,8 +265,8 @@ namespace strmd
 					0x03, 0x00, 0x00, 0x00, 'T', 'h', 'e',
 					0x67, 0x61,
 				};
-				vector_reader r(buffer);
-				deserializer<vector_reader> d(r);
+				buffer_reader r(buffer);
+				deserializer<buffer_reader> d(r);
 				A a;
 				C c;
 

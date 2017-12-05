@@ -42,6 +42,14 @@ namespace strmd
 	template <> struct is_arithmetic<float> { static const bool value = true; };
 	template <> struct is_arithmetic<double> { static const bool value = true; };
 
+	template <typename T> struct remove_sign { typedef T type; };
+	template <> struct remove_sign<signed char> { typedef unsigned char type; };
+	template <> struct remove_sign<signed short> { typedef unsigned short type; };
+	template <> struct remove_sign<signed int> { typedef unsigned int type; };
+	template <> struct remove_sign<signed long> { typedef unsigned long type; };
+	template <> struct remove_sign<signed long long> { typedef unsigned long long type; };
+
+
 
 	template <typename T> struct is_container { static const bool value = false; };
 	template <typename T> struct is_container< std::basic_string<T> > { static const bool value = true; };

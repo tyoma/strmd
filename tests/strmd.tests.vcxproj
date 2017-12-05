@@ -37,13 +37,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DeserializerTests.cpp" />
+    <ClCompile Include="PackerTests.cpp" />
     <ClCompile Include="SerializerTests.cpp" />
     <ClCompile Include="TypeTraitsTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\strmd\deserializer.h" />
+    <ClInclude Include="..\strmd\packer.h" />
     <ClInclude Include="..\strmd\serializer.h" />
     <ClInclude Include="..\strmd\type_traits.h" />
+    <ClInclude Include="helpers.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

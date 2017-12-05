@@ -8,7 +8,7 @@ namespace strmd
 	class deserializer
 	{
 	public:
-		deserializer(StreamT &reader);
+		deserializer(StreamT &stream);
 
 		template <typename T>
 		void operator ()(T &data);
@@ -26,11 +26,11 @@ namespace strmd
 		void operator =(const deserializer &other);
 
 	private:
-		StreamT &_reader;
+		StreamT &_stream;
 	};
 
 	template <typename ContainerT>
-	struct container_reader
+	struct container_stream
 	{
 		template <typename ArchiveT>
 		void operator()(ArchiveT &archive, size_t count, ContainerT &data)
@@ -47,7 +47,7 @@ namespace strmd
 	};
 
 	template <typename KeyT, typename ValueT, typename CompT>
-	struct container_reader< std::unordered_map<KeyT, ValueT, CompT> >
+	struct container_stream< std::unordered_map<KeyT, ValueT, CompT> >
 	{
 		template <typename ArchiveT>
 		void operator()(ArchiveT &archive, size_t count, std::unordered_map<KeyT, ValueT, CompT> &data)
@@ -66,8 +66,8 @@ namespace strmd
 
 
 	template <typename StreamT>
-	inline deserializer<StreamT>::deserializer(StreamT &reader)
-		: _reader(reader)
+	inline deserializer<StreamT>::deserializer(StreamT &stream)
+		: _stream(stream)
 	{	}
 
 	template <typename StreamT>
@@ -82,17 +82,17 @@ namespace strmd
 	template <typename StreamT>
 	template <typename T>
 	inline void deserializer<StreamT>::process_arithmetic(T &data)
-	{	_reader.read(&data, sizeof(T));	}
+	{	_stream.read(&data, sizeof(T));	}
 
 	template <typename StreamT>
 	template <typename T>
 	inline size_t deserializer<StreamT>::process_container(T &data)
 	{
 		unsigned int size;
-		container_reader<T> reader;
+		container_stream<T> stream;
 
 		(*this)(size);
-		reader(*this, size, data);
+		stream(*this, size, data);
 		return size;
 	}
 

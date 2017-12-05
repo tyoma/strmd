@@ -1,5 +1,6 @@
 #include <strmd/serializer.h>
 
+#include "helpers.h"
 #include "types.h"
 
 #include <ut/assert.h>
@@ -11,29 +12,6 @@ namespace strmd
 {
 	namespace tests
 	{
-		namespace
-		{
-			class vector_writer
-			{
-			public:
-				vector_writer(vector<unsigned char> &buffer)
-					: _buffer(buffer)
-				{	}
-
-				void write(const void *data, size_t size)
-				{
-					_buffer.insert(_buffer.end(), static_cast<const unsigned char *>(data),
-						static_cast<const unsigned char *>(data)+size);
-				}
-
-			private:
-				void operator =(const vector_writer &other);
-
-			private:
-				vector<unsigned char> &_buffer;
-			};
-		}
-
 		begin_test_suite( SerializerTests )
 			vector<unsigned char> buffer;
 

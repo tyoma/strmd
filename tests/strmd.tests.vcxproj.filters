@@ -4,6 +4,7 @@
     <ClCompile Include="SerializerTests.cpp" />
     <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="TypeTraitsTests.cpp" />
+    <ClCompile Include="PackerTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library Headers">
@@ -21,5 +22,9 @@
       <Filter>Library Headers</Filter>
     </ClInclude>
     <ClInclude Include="types.h" />
+    <ClInclude Include="helpers.h" />
+    <ClInclude Include="..\strmd\packer.h">
+      <Filter>Library Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

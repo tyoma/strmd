@@ -26,13 +26,13 @@ namespace strmd
 		void operator =(const serializer &other);
 
 	private:
-		StreamT &_writer;
+		StreamT &_stream;
 	};
 
 
 	template <typename StreamT>
-	inline serializer<StreamT>::serializer(StreamT &writer)
-		: _writer(writer)
+	inline serializer<StreamT>::serializer(StreamT &stream)
+		: _stream(stream)
 	{	}
 
 	template <typename StreamT>
@@ -47,7 +47,7 @@ namespace strmd
 	template <typename StreamT>
 	template <typename T>
 	inline void serializer<StreamT>::process_arithmetic(T data)
-	{	_writer.write(&data, sizeof(data));	}
+	{	_stream.write(&data, sizeof(data));	}
 
 	template <typename StreamT>
 	template <typename ContainerT>

@@ -1,0 +1,239 @@
+#include <strmd/packer.h>
+
+#include "helpers.h"
+
+#include <ut/assert.h>
+#include <ut/test.h>
+
+using namespace std;
+
+namespace strmd
+{
+	namespace tests
+	{
+		begin_test_suite( PackerTests )
+
+			vector<unsigned char> buffer;
+
+			test( ZeroTakesOneByteWithTerminator )
+			{
+				// INIT
+				vector_writer stream(buffer);
+
+				// ACT
+				varint::pack(stream, static_cast<unsigned char>(0));
+
+				// ASSERT
+				unsigned char reference1[] = { varint::terminator, };
+
+				assert_equal(reference1, buffer);
+
+				// ACT
+				varint::pack(stream, static_cast<unsigned short>(0));
+				varint::pack(stream, static_cast<unsigned int>(0));
+				varint::pack(stream, static_cast<unsigned long long int>(0));
+
+				// ASSERT
+				unsigned char reference2[] = {
+					varint::terminator, varint::terminator, varint::terminator, varint::terminator,
+				};
+
+				assert_equal(reference2, buffer);
+			}
+
+
+			test( SevenBitValuesAreEncodedIntoOneByte )
+			{
+				// INIT
+				vector_writer stream(buffer);
+
+				// ACT
+				varint::pack(stream, static_cast<unsigned char>(0x01));
+				varint::pack(stream, static_cast<unsigned short>(0x01));
+				varint::pack(stream, static_cast<unsigned int>(0x01));
+				varint::pack(stream, static_cast<unsigned long long int>(0x01));
+
+				// ASSERT
+				unsigned char reference1[] = {
+					0x01 | varint::terminator,
+					0x01 | varint::terminator,
+					0x01 | varint::terminator,
+					0x01 | varint::terminator,
+				};
+
+				assert_equal(reference1, buffer);
+
+				// INIT
+				buffer.clear();
+
+				// ACT
+				varint::pack(stream, static_cast<unsigned char>(0x13));
+				varint::pack(stream, static_cast<unsigned short>(0x17));
+				varint::pack(stream, static_cast<unsigned int>(0x19));
+				varint::pack(stream, static_cast<unsigned long long int>(0x31));
+
+				// ASSERT
+				unsigned char reference2[] = {
+					0x13 | varint::terminator,
+					0x17 | varint::terminator,
+					0x19 | varint::terminator,
+					0x31 | varint::terminator,
+				};
+
+				assert_equal(reference2, buffer);
+			}
+
+
+			test( EightBitValuesTakeTwoBytesToPack )
+			{
+				// INIT
+				vector_writer stream(buffer);
+
+				// ACT
+				varint::pack(stream, static_cast<unsigned char>(0x81));
+
+				// ASSERT
+				unsigned char reference1[] = {
+					0x01, 0x81 | varint::terminator,
+				};
+
+				assert_equal(reference1, buffer);
+
+				// INIT
+				buffer.clear();
+
+				// ACT
+				varint::pack(stream, static_cast<unsigned short>(0x8F));
+				varint::pack(stream, static_cast<unsigned int>(0xF0));
+				varint::pack(stream, static_cast<unsigned long long>(0xFF));
+
+				// ASSERT
+				unsigned char reference2[] = {
+					0x0F, 0x81 | varint::terminator,
+					0x70, 0x81 | varint::terminator,
+					0x7F, 0x81 | varint::terminator,
+				};
+
+				assert_equal(reference2, buffer);
+			}
+
+
+			test( Arbitrary64BitNumbersPackedUpToTenBytes )
+			{
+				// INIT
+				vector_writer stream(buffer);
+
+				// ACT
+				varint::pack(stream, 0x800000000u);
+
+				// ASSERT
+				unsigned char reference1[] = {
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x01 | varint::terminator,
+				};
+
+				assert_equal(reference1, buffer);
+
+				// INIT
+				buffer.clear();
+
+				// ACT
+				varint::pack(stream, 0xF4844212000000F0u);
+
+				// ASSERT
+				unsigned char reference2[] = {
+					0x70, 0x01, 0x00, 0x00, 0x20, 0x42, 0x10, 0x42, 0x74, 0x01 | varint::terminator,
+				};
+
+				assert_equal(reference2, buffer);
+			}
+
+
+			test( SignedValuesAreZigZagedOnEncoding )
+			{
+				// INIT
+				vector_writer stream(buffer);
+
+				// ACT
+				varint::pack(stream, short(-16));
+
+				// ASSERT
+				unsigned char reference1[] = {
+					varint::terminator | 0x1F,
+				};
+
+				assert_equal(reference1, buffer);
+
+				// ACT
+				varint::pack(stream, static_cast<signed char>(-15));
+				varint::pack(stream, static_cast<int>(-65536));
+				varint::pack(stream, numeric_limits<int>::min());
+				varint::pack(stream, numeric_limits<long long>::min());
+
+				// ASSERT
+				unsigned char reference2[] = {
+					0x1F | varint::terminator,
+					0x1D | varint::terminator,
+					0x7F, 0x7F, 0x07 | varint::terminator,
+					0x7F, 0x7F, 0x7F, 0x7F, 0x0F | varint::terminator,
+					0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x01 | varint::terminator,
+				};
+
+				assert_equal(reference2, buffer);
+			}
+
+
+			test( SignedMinLongIsPackedTheSameWayAsUnsignedMaxLong )
+			{
+				// INIT
+				vector_writer stream(buffer);
+
+				// ACT (hello x64 UNIX)
+				varint::pack(stream, numeric_limits<long>::min());
+
+				// ASSERT
+				vector<unsigned char> actual = buffer;
+
+				buffer.clear();
+				varint::pack(stream, numeric_limits<unsigned long>::max());
+
+				assert_equal(buffer, actual);
+			}
+
+		end_test_suite
+
+
+		begin_test_suite( UnpackerTests )
+			test( ZeroesAreDecodedFromSingleBytes )
+			{
+				// INIT
+				unsigned char buffer[] = {
+					varint::terminator, varint::terminator, varint::terminator, varint::terminator, varint::terminator,
+				};
+				buffer_reader stream(buffer);
+				unsigned char uc = 1;
+				unsigned short us = 1;
+				unsigned int ui = 1;
+				unsigned long int ul = 1;
+				unsigned long long int ull = 1;
+
+				// ACT
+				varint::unpack(stream, uc);
+
+				// ASSERT
+				assert_equal(0u, uc);
+
+				// ACT
+				varint::unpack(stream, us);
+				varint::unpack(stream, ui);
+				varint::unpack(stream, ul);
+				varint::unpack(stream, ull);
+
+				// ASSERT
+				assert_equal(0u, us);
+				assert_equal(0u, ui);
+				assert_equal(0u, ul);
+				assert_equal(0u, ull);
+			}
+		end_test_suite
+	}
+}
