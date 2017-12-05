@@ -22,7 +22,7 @@ namespace strmd
 		static void pack(StreamT &stream, T value)
 		{
 			if (std::numeric_limits<T>::is_signed)
-				pack_unsigned<typename remove_sign<T>::type>(stream, (value << 1) ^ (value >> (sizeof(T) * 8 - 1)));
+				pack_unsigned<typename remove_sign<T>::type>(stream, zigzag(value));
 			else
 				pack_unsigned(stream, value);
 		}
@@ -34,6 +34,10 @@ namespace strmd
 		}
 
 	private:
+		template <typename T>
+		static typename remove_sign<T>::type zigzag(T value)
+		{	return (value << 1) ^ (value >> (sizeof(T) * 8 - 1));	}
+
 		template <typename T, typename StreamT>
 		static void pack_unsigned(StreamT &stream, T value)
 		{
