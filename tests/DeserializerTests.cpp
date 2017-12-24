@@ -190,10 +190,13 @@ namespace strmd
 
 				// ASSERT
 				pair<char, unsigned short> reference1[] = {
-					make_pair('a', 0x1310), make_pair('c', 0x1000), make_pair('Z', 0x0030),
+					make_pair('a', static_cast<unsigned short>(0x1310)),
+               make_pair('c', static_cast<unsigned short>(0x1000)),
+               make_pair('Z', static_cast<unsigned short>(0x0030)),
 				};
 				pair<unsigned short, int> reference2[] = {
-					make_pair(0x1234, 0x11100000), make_pair(0x2143, 0x11000010),
+					make_pair(static_cast<unsigned short>(0x1234), 0x11100000),
+               make_pair(static_cast<unsigned short>(0x2143), 0x11000010),
 				};
 
 				assert_equivalent(reference1, (vector< pair<char, unsigned short> >(ucus.begin(), ucus.end())));
@@ -220,7 +223,9 @@ namespace strmd
 
 				// ASSERT
 				pair<char, unsigned short> reference1[] = {
-					make_pair('a', 0x1310), make_pair('c', 0x1000), make_pair('Z', 0x0030),
+					make_pair('a', static_cast<unsigned short>(0x1310)),
+               make_pair('c', static_cast<unsigned short>(0x1000)),
+               make_pair('Z', static_cast<unsigned short>(0x0030)),
 				};
 				unsigned short reference2[] = {
 					0x1134, 0x3012,
