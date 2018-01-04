@@ -206,6 +206,7 @@ namespace strmd
 
 				// ACT
 				s(static_cast<char>(-1));
+				s(static_cast<wchar_t>(0x321A));
 				s(static_cast<unsigned char>(2));
 				s(static_cast<short>(-300));
 				s(static_cast<unsigned short>(1000));
@@ -217,17 +218,18 @@ namespace strmd
 				s(1.1234);
 
 				// ASSERT
-				assert_equal(42u, buffer.size());
+				assert_equal(44u, buffer.size());
 				assert_equal(-1, *reinterpret_cast<const char *>(&buffer[0]));
-				assert_equal(2u, *reinterpret_cast<const unsigned char *>(&buffer[1]));
-				assert_equal(-300, *reinterpret_cast<const short *>(&buffer[2]));
-				assert_equal(1000u, *reinterpret_cast<const unsigned short *>(&buffer[4]));
-				assert_equal(-100000, *reinterpret_cast<const int *>(&buffer[6]));
-				assert_equal(200000u, *reinterpret_cast<const unsigned int *>(&buffer[10]));
-				assert_equal(-10000000000, *reinterpret_cast<const long long *>(&buffer[14]));
-				assert_equal(10000000000u, *reinterpret_cast<const unsigned long long *>(&buffer[22]));
-				assert_equal(1.23f, *reinterpret_cast<const float *>(&buffer[30]));
-				assert_equal(1.1234, *reinterpret_cast<const double *>(&buffer[34]));
+				assert_equal(0x321A, *reinterpret_cast<const wchar_t *>(&buffer[1]));
+				assert_equal(2u, *reinterpret_cast<const unsigned char *>(&buffer[3]));
+				assert_equal(-300, *reinterpret_cast<const short *>(&buffer[4]));
+				assert_equal(1000u, *reinterpret_cast<const unsigned short *>(&buffer[6]));
+				assert_equal(-100000, *reinterpret_cast<const int *>(&buffer[8]));
+				assert_equal(200000u, *reinterpret_cast<const unsigned int *>(&buffer[12]));
+				assert_equal(-10000000000, *reinterpret_cast<const long long *>(&buffer[16]));
+				assert_equal(10000000000u, *reinterpret_cast<const unsigned long long *>(&buffer[24]));
+				assert_equal(1.23f, *reinterpret_cast<const float *>(&buffer[32]));
+				assert_equal(1.1234, *reinterpret_cast<const double *>(&buffer[36]));
 			}
 
 

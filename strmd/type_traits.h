@@ -30,6 +30,7 @@ namespace strmd
 {
 	template <typename T> struct is_arithmetic { static const bool value = false; };
 	template <> struct is_arithmetic<char> { static const bool value = true; };
+	template <> struct is_arithmetic<wchar_t> { static const bool value = true; };
 	template <> struct is_arithmetic<unsigned char> { static const bool value = true; };
 	template <> struct is_arithmetic<short> { static const bool value = true; };
 	template <> struct is_arithmetic<unsigned short> { static const bool value = true; };

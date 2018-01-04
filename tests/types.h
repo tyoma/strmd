@@ -26,7 +26,7 @@ namespace strmd
 		};
 
 		template <typename ArchiveT>
-		void serialize(ArchiveT &archive, A &v)
+		inline void serialize(ArchiveT &archive, A &v)
 		{
 			archive(v.a);
 			archive(v.b);
@@ -34,14 +34,14 @@ namespace strmd
 		}
 
 		template <typename ArchiveT>
-		void serialize(ArchiveT &archive, B &v)
+		inline void serialize(ArchiveT &archive, B &v)
 		{
 			archive(v.a);
 			archive(v.b);
 		}
 
 		template <typename ArchiveT>
-		void serialize(ArchiveT &archive, C &v)
+		inline void serialize(ArchiveT &archive, C &v)
 		{
 			archive(v.b);
 			archive(v.a);

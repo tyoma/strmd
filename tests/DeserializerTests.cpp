@@ -40,10 +40,11 @@ namespace strmd
 			test( AllPrimitiveTypesAreDeserializedAsZeroValuesFromZeroBuffer )
 			{
 				// INIT
-				unsigned char buffer[42] = { };
+				unsigned char buffer[44] = { };
 				buffer_reader r(buffer);
 				deserializer<buffer_reader> d(r);
 				char data_c = 1;
+				wchar_t data_wc = L'X';
 				unsigned char data_uc = 1;
 				short data_si = 1;
 				unsigned short data_usi = 1;
@@ -56,6 +57,7 @@ namespace strmd
 
 				// ACT
 				d(data_c);
+				d(data_wc);
 				d(data_uc);
 				d(data_si);
 				d(data_usi);
@@ -68,6 +70,7 @@ namespace strmd
 
 				// ASSERT
 				assert_equal(0, data_c);
+				assert_equal(L'\0', data_wc);
 				assert_equal(0u, data_uc);
 				assert_equal(0, data_si);
 				assert_equal(0u, data_usi);
@@ -83,10 +86,11 @@ namespace strmd
 			test( PrimitiveTypesAreDeserialized )
 			{
 				// INIT
-				unsigned char buffer[42] = { };
+				unsigned char buffer[44] = { };
 				buffer_reader r(buffer);
 				deserializer<buffer_reader> d(r);
 				char data_c = 1;
+				wchar_t data_wc = 1;
 				unsigned char data_uc = 1;
 				short data_si = 1;
 				unsigned short data_usi = 1;
@@ -98,18 +102,20 @@ namespace strmd
 				double data_d = 1;
 
 				*reinterpret_cast<char *>(&buffer[0]) = -1;
-				*reinterpret_cast<unsigned char *>(&buffer[1]) = 2u;
-				*reinterpret_cast<short *>(&buffer[2]) = -300;
-				*reinterpret_cast<unsigned short *>(&buffer[4]) = 1000u;
-				*reinterpret_cast<int *>(&buffer[6]) = -100000;
-				*reinterpret_cast<unsigned int *>(&buffer[10]) = 200000u;
-				*reinterpret_cast<long long *>(&buffer[14]) = -10000000000;
-				*reinterpret_cast<unsigned long long *>(&buffer[22]) = 10000000000u;
-				*reinterpret_cast<float *>(&buffer[30]) = 1.23f;
-				*reinterpret_cast<double *>(&buffer[34]) = 1.1234;
+				*reinterpret_cast<wchar_t *>(&buffer[1]) = 0x1234;
+				*reinterpret_cast<unsigned char *>(&buffer[3]) = 2u;
+				*reinterpret_cast<short *>(&buffer[4]) = -300;
+				*reinterpret_cast<unsigned short *>(&buffer[6]) = 1000u;
+				*reinterpret_cast<int *>(&buffer[8]) = -100000;
+				*reinterpret_cast<unsigned int *>(&buffer[12]) = 200000u;
+				*reinterpret_cast<long long *>(&buffer[16]) = -10000000000;
+				*reinterpret_cast<unsigned long long *>(&buffer[24]) = 10000000000u;
+				*reinterpret_cast<float *>(&buffer[32]) = 1.23f;
+				*reinterpret_cast<double *>(&buffer[36]) = 1.1234;
 
 				// ACT
 				d(data_c);
+				d(data_wc);
 				d(data_uc);
 				d(data_si);
 				d(data_usi);
@@ -122,6 +128,7 @@ namespace strmd
 
 				// ASSERT
 				assert_equal(-1, data_c);
+				assert_equal(0x1234, data_wc);
 				assert_equal(2u, data_uc);
 				assert_equal(-300, data_si);
 				assert_equal(1000u, data_usi);
