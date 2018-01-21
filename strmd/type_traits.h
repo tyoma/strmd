@@ -24,8 +24,6 @@
 #include <unordered_map>
 #include <vector>
 
-namespace std { namespace tr1 { } using namespace tr1; }
-
 namespace strmd
 {
 	template <typename T> struct is_arithmetic { static const bool value = false; };
