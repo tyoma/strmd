@@ -13,6 +13,8 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <GccExceptionHandling>true</GccExceptionHandling>
+      <RuntimeTypeInfo Condition="'$(Platform)'=='Android'">true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
