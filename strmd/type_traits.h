@@ -41,7 +41,13 @@ namespace strmd
 	template <> struct is_arithmetic<float> { static const bool value = true; };
 	template <> struct is_arithmetic<double> { static const bool value = true; };
 
+	template <typename T> struct is_char { static const bool value = false; };
+	template <> struct is_char<char> { static const bool value = true; };
+	template <> struct is_char<signed char> { static const bool value = true; };
+	template <> struct is_char<unsigned char> { static const bool value = true; };
+
 	template <typename T> struct remove_sign { typedef T type; };
+	template <> struct remove_sign<char> { typedef unsigned char type; };
 	template <> struct remove_sign<signed char> { typedef unsigned char type; };
 	template <> struct remove_sign<signed short> { typedef unsigned short type; };
 	template <> struct remove_sign<signed int> { typedef unsigned int type; };

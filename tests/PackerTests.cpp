@@ -164,7 +164,9 @@ namespace strmd
 				assert_equal(reference1, buffer);
 
 				// ACT
-				varint::pack(stream, static_cast<signed char>(-15));
+				varint::pack(stream, static_cast<char>(0x1B));  // treated as unsigned
+				varint::pack(stream, static_cast<unsigned char>(0x1D));
+				varint::pack(stream, static_cast<signed char>(0x7E));  // treated as unsigned
 				varint::pack(stream, static_cast<int>(-65536));
 				varint::pack(stream, numeric_limits<int>::min());
 				varint::pack(stream, numeric_limits<long long>::min());
@@ -172,7 +174,9 @@ namespace strmd
 				// ASSERT
 				unsigned char reference2[] = {
 					0x1F | varint::terminator,
+					0x1B | varint::terminator,
 					0x1D | varint::terminator,
+					0x7E | varint::terminator,
 					0x7F, 0x7F, 0x07 | varint::terminator,
 					0x7F, 0x7F, 0x7F, 0x7F, 0x0F | varint::terminator,
 					0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x01 | varint::terminator,
@@ -314,6 +318,7 @@ namespace strmd
 			{
 				// INIT
 				unsigned char buffer[] = {
+					0x19 | varint::terminator,
 					0x18 | varint::terminator,
 					0x79 | varint::terminator,
 					0x5B | varint::terminator,
@@ -321,6 +326,7 @@ namespace strmd
 					0x7F | varint::terminator,
 				};
 				buffer_reader stream(buffer);
+				signed char c = 1;
 				signed char sc = 1;
 				signed short ss = 1;
 				signed int si = 1;
@@ -328,10 +334,12 @@ namespace strmd
 				signed long long int sll = 1;
 
 				// ACT
-				varint::unpack(stream, sc);
+				varint::unpack(stream, c); // treated as unsigned
+				varint::unpack(stream, sc); // treated as unsigned
 
 				// ASSERT
-				assert_equal(0x0C, sc);
+				assert_equal(0x19, c);
+				assert_equal(0x18, sc);
 
 				// ACT
 				varint::unpack(stream, ss);
