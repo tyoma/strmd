@@ -1,6 +1,8 @@
-include_directories(${STRMD_SOURCE_DIR}/libraries/utee)
+cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frtti")
+include(test)
+
+add_compile_options("$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-std=c++11>")
 
 set(STRMD_TEST_SOURCES
 	DeserializerTests.cpp
@@ -10,5 +12,3 @@ set(STRMD_TEST_SOURCES
 )
 
 add_library(strmd.tests SHARED ${STRMD_TEST_SOURCES})
-
-target_link_libraries(strmd.tests utee)

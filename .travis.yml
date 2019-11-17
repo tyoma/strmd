@@ -9,4 +9,4 @@ script:
  - cd _build
  - cmake ..
  - make
- - bin/utee-runner bin/libstrmd.tests.so
+ - _bin/utee-runner _bin/libstrmd.tests.so
