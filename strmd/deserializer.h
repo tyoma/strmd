@@ -73,11 +73,11 @@ namespace strmd
 		template <typename ArchiveT>
 		void operator()(ArchiveT &archive, size_t count, std::unordered_map<KeyT, ValueT, CompT> &data)
 		{
-			std::pair<KeyT, ValueT> value;
-
 			data.clear();
 			while (count--)
 			{
+				std::pair<KeyT, ValueT> value;
+
 				archive(value);
 				data.insert(value);
 			}
