@@ -74,7 +74,7 @@ namespace strmd
 	template <typename ContainerT>
 	inline void serializer<StreamT, PackerT>::process_container(const ContainerT &data)
 	{
-		(*this)(static_cast<const unsigned int>(data.size()));
+		(*this)(static_cast<unsigned int>(data.size()));
 		for (typename ContainerT::const_iterator i = data.begin(); i != data.end(); ++i)
 			(*this)(*i);
 	}

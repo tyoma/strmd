@@ -50,33 +50,33 @@ namespace strmd
 		StreamT &_stream;
 	};
 
-	template <typename ContainerT>
+	template < typename ContainerT, bool is_associative_ = is_associative<ContainerT>::value >
 	struct container_reader
 	{
 		template <typename ArchiveT>
 		void operator()(ArchiveT &archive, size_t count, ContainerT &data)
 		{
-			typename ContainerT::value_type value;
-
 			data.clear();
 			while (count--)
 			{
+				typename ContainerT::value_type value;
+
 				archive(value);
 				data.push_back(value);
 			}
 		}
 	};
 
-	template <typename KeyT, typename ValueT, typename CompT>
-	struct container_reader< std::unordered_map<KeyT, ValueT, CompT> >
+	template <typename ContainerT>
+	struct container_reader<ContainerT, true>
 	{
 		template <typename ArchiveT>
-		void operator()(ArchiveT &archive, size_t count, std::unordered_map<KeyT, ValueT, CompT> &data)
+		void operator()(ArchiveT &archive, size_t count, ContainerT &data)
 		{
 			data.clear();
 			while (count--)
 			{
-				std::pair<KeyT, ValueT> value;
+				typename remove_const<typename ContainerT::value_type>::type value;
 
 				archive(value);
 				data.insert(value);
@@ -109,12 +109,12 @@ namespace strmd
 	template <typename T>
 	inline size_t deserializer<StreamT, PackerT>::process_container(T &data)
 	{
-		unsigned int size;
+		unsigned int count;
 		container_reader<T> reader;
 
-		(*this)(size);
-		reader(*this, size, data);
-		return size;
+		(*this)(count);
+		reader(*this, count, data);
+		return count;
 	}
 
 	template <typename StreamT, typename PackerT>

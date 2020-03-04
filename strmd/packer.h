@@ -22,8 +22,6 @@
 
 #include "type_traits.h"
 
-#include <limits>
-
 namespace strmd
 {
 	struct direct
@@ -74,26 +72,27 @@ namespace strmd
 	template <bool enable>
 	struct zigzag
 	{
-		template <typename T> static typename remove_sign<T>::type  encode(T value) { return value; }
-		template <typename T> static T decode(typename remove_sign<T>::type value) { return value; }
+		template <typename T> static typename make_unsigned<T>::type encode(T value) { return value; }
+		template <typename T> static T decode(typename make_unsigned<T>::type value) { return value; }
 	};
 
 	template <>
 	struct zigzag<true>
 	{
-		template <typename T> static typename remove_sign<T>::type encode(T value) { return (value << 1) ^ (value >> (sizeof(T) * 8 - 1)); }
-		template <typename T> static T decode(typename remove_sign<T>::type value) { return (value >> 1) ^ (-(T(value) & 0x01)); }
+		template <typename T> static typename make_unsigned<T>::type encode(T value) { return (value << 1) ^ (value >> (sizeof(T) * 8 - 1)); }
+		template <typename T> static T decode(typename make_unsigned<T>::type value) { return (value >> 1) ^ (-(T(value) & 0x01)); }
 	};
+
 
 	template <typename StreamT, typename T>
 	inline void varint::pack(StreamT &stream, T value)
-	{	pack_unsigned(stream, zigzag<std::numeric_limits<T>::is_signed && !is_char<T>::value>::encode(value));	}
+	{	pack_unsigned(stream, zigzag<is_signed<T>::value && !is_char<T>::value>::encode(value));	}
 
 	template <typename StreamT, typename T>
 	inline void varint::unpack(StreamT &stream, T &value)
 	{
 		unpack_unsigned(stream, value);
-		value = zigzag<std::numeric_limits<T>::is_signed && !is_char<T>::value>::template decode<T>(value);
+		value = zigzag<is_signed<T>::value && !is_char<T>::value>::template decode<T>(value);
 	}
 
 	template <typename T, typename StreamT>
@@ -115,7 +114,7 @@ namespace strmd
 	{
 		unsigned char b, shift = 0;
 
-		value = 0;
+		value = T();
 		do
 		{
 			stream.read(&b, 1);
