@@ -2,6 +2,7 @@
 
 #include "helpers.h"
 
+#include <limits>
 #include <ut/assert.h>
 #include <ut/test.h>
 

@@ -238,7 +238,7 @@ namespace strmd
 				// INIT
 				vector_writer w(buffer);
 				serializer<vector_writer> s(w);
-				unordered_map<int, B> mib;
+				map<int, B> mib;
 				B b[] = { { 1, 2 }, { 54, 17 }, };
 
 				mib[8] = b[0];
@@ -249,7 +249,7 @@ namespace strmd
 				s(mib);
 
 				// ASSERT
-				unordered_map<int, B>::const_iterator i = mib.begin();
+				map<int, B>::const_iterator i = mib.begin();
 
 				assert_equal(22u, buffer.size());
 				assert_equal(3u, *reinterpret_cast<unsigned int *>(&buffer[0]));

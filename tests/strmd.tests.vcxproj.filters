@@ -5,6 +5,7 @@
     <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="TypeTraitsTests.cpp" />
     <ClCompile Include="PackerTests.cpp" />
+    <ClCompile Include="TypeTraitsExTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library Headers">
@@ -24,6 +25,9 @@
     <ClInclude Include="types.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="..\strmd\packer.h">
+      <Filter>Library Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\strmd\type_traits_ex.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
   </ItemGroup>

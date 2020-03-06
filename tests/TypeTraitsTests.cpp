@@ -3,17 +3,9 @@
 #include "helpers.h"
 #include "types.h"
 
-#include <deque>
-#include <list>
-#include <map>
 #include <memory>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <ut/assert.h>
 #include <ut/test.h>
-#include <vector>
 
 using namespace std;
 
@@ -106,68 +98,31 @@ namespace strmd
 				assert_is_true(is_container< set<A> >::value);
 				assert_is_true(is_container< multiset<int> >::value);
 				assert_is_true(is_container< multiset<A> >::value);
-				assert_is_true(is_container< unordered_set<int> >::value);
-				assert_is_true(is_container< unordered_set<A> >::value);
-				assert_is_true(is_container< unordered_multiset<int> >::value);
-				assert_is_true(is_container< unordered_multiset<A> >::value);
 
 				assert_is_true((is_container< set<int, custom_compare> >::value));
 				assert_is_true((is_container< set<A, custom_compare> >::value));
 				assert_is_true((is_container< multiset<int, custom_compare> >::value));
 				assert_is_true((is_container< multiset<A, custom_compare> >::value));
-				assert_is_true((is_container< unordered_set<int, custom_hash> >::value));
-				assert_is_true((is_container< unordered_set<A, custom_hash> >::value));
-				assert_is_true((is_container< unordered_multiset<int, custom_hash> >::value));
-				assert_is_true((is_container< unordered_multiset<A, custom_hash> >::value));
 
 				assert_is_true((is_container< set<int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_container< set<A, custom_compare, custom_allocator<A> > >::value));
 				assert_is_true((is_container< multiset<int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_container< multiset<A, custom_compare, custom_allocator<A> > >::value));
 
-				assert_is_true((is_container< unordered_set<int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_container< unordered_set<A, custom_hash, custom_compare> >::value));
-				assert_is_true((is_container< unordered_multiset<int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_container< unordered_multiset<A, custom_hash, custom_compare> >::value));
-
-				assert_is_true((is_container< unordered_set<int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< unordered_set<A, custom_hash, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_container< unordered_multiset<int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< unordered_multiset<A, custom_hash, custom_compare, custom_allocator<A> > >::value));
-
-
 				assert_is_true(is_associative< set<int> >::value);
 				assert_is_true(is_associative< set<A> >::value);
 				assert_is_true(is_associative< multiset<int> >::value);
 				assert_is_true(is_associative< multiset<A> >::value);
-				assert_is_true(is_associative< unordered_set<int> >::value);
-				assert_is_true(is_associative< unordered_set<A> >::value);
-				assert_is_true(is_associative< unordered_multiset<int> >::value);
-				assert_is_true(is_associative< unordered_multiset<A> >::value);
 
 				assert_is_true((is_associative< set<int, custom_compare> >::value));
 				assert_is_true((is_associative< set<A, custom_compare> >::value));
 				assert_is_true((is_associative< multiset<int, custom_compare> >::value));
 				assert_is_true((is_associative< multiset<A, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_set<int, custom_hash> >::value));
-				assert_is_true((is_associative< unordered_set<A, custom_hash> >::value));
-				assert_is_true((is_associative< unordered_multiset<int, custom_hash> >::value));
-				assert_is_true((is_associative< unordered_multiset<A, custom_hash> >::value));
 
 				assert_is_true((is_associative< set<int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_associative< set<A, custom_compare, custom_allocator<A> > >::value));
 				assert_is_true((is_associative< multiset<int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_associative< multiset<A, custom_compare, custom_allocator<A> > >::value));
-
-				assert_is_true((is_associative< unordered_set<int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_set<A, custom_hash, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_multiset<int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_multiset<A, custom_hash, custom_compare> >::value));
-
-				assert_is_true((is_associative< unordered_set<int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< unordered_set<A, custom_hash, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_associative< unordered_multiset<int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< unordered_multiset<A, custom_hash, custom_compare, custom_allocator<A> > >::value));
 			}
 
 
@@ -178,68 +133,31 @@ namespace strmd
 				assert_is_true((is_container< map<A, int> >::value));
 				assert_is_true((is_container< multimap<int, int> >::value));
 				assert_is_true((is_container< multimap<A, int> >::value));
-				assert_is_true((is_container< unordered_map<int, int> >::value));
-				assert_is_true((is_container< unordered_map<A, int> >::value));
-				assert_is_true((is_container< unordered_multimap<int, int> >::value));
-				assert_is_true((is_container< unordered_multimap<A, int> >::value));
 
 				assert_is_true((is_container< map<int, int, custom_compare> >::value));
 				assert_is_true((is_container< map<A, int, custom_compare> >::value));
 				assert_is_true((is_container< multimap<int, int, custom_compare> >::value));
 				assert_is_true((is_container< multimap<A, int, custom_compare> >::value));
-				assert_is_true((is_container< unordered_map<int, int, custom_hash> >::value));
-				assert_is_true((is_container< unordered_map<A, int, custom_hash> >::value));
-				assert_is_true((is_container< unordered_multimap<int, int, custom_hash> >::value));
-				assert_is_true((is_container< unordered_multimap<A, int, custom_hash> >::value));
 
 				assert_is_true((is_container< map<int, int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_container< map<A, int, custom_compare, custom_allocator<A> > >::value));
 				assert_is_true((is_container< multimap<int, int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_container< multimap<A, int, custom_compare, custom_allocator<A> > >::value));
 
-				assert_is_true((is_container< unordered_map<int, int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_container< unordered_map<A, int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_container< unordered_multimap<int, int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_container< unordered_multimap<A, int, custom_hash, custom_compare> >::value));
-
-				assert_is_true((is_container< unordered_map<int, int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< unordered_map<A, int, custom_hash, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_container< unordered_multimap<int, int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< unordered_multimap<A, int, custom_hash, custom_compare, custom_allocator<A> > >::value));
-
-
 				assert_is_true((is_associative< map<int, int> >::value));
 				assert_is_true((is_associative< map<A, int> >::value));
 				assert_is_true((is_associative< multimap<int, int> >::value));
 				assert_is_true((is_associative< multimap<A, int> >::value));
-				assert_is_true((is_associative< unordered_map<int, int> >::value));
-				assert_is_true((is_associative< unordered_map<A, int> >::value));
-				assert_is_true((is_associative< unordered_multimap<int, int> >::value));
-				assert_is_true((is_associative< unordered_multimap<A, int> >::value));
 
 				assert_is_true((is_associative< map<int, int, custom_compare> >::value));
 				assert_is_true((is_associative< map<A, int, custom_compare> >::value));
 				assert_is_true((is_associative< multimap<int, int, custom_compare> >::value));
 				assert_is_true((is_associative< multimap<A, int, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_map<int, int, custom_hash> >::value));
-				assert_is_true((is_associative< unordered_map<A, int, custom_hash> >::value));
-				assert_is_true((is_associative< unordered_multimap<int, int, custom_hash> >::value));
-				assert_is_true((is_associative< unordered_multimap<A, int, custom_hash> >::value));
 
 				assert_is_true((is_associative< map<int, int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_associative< map<A, int, custom_compare, custom_allocator<A> > >::value));
 				assert_is_true((is_associative< multimap<int, int, custom_compare, custom_allocator<int> > >::value));
 				assert_is_true((is_associative< multimap<A, int, custom_compare, custom_allocator<A> > >::value));
-
-				assert_is_true((is_associative< unordered_map<int, int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_map<A, int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_multimap<int, int, custom_hash, custom_compare> >::value));
-				assert_is_true((is_associative< unordered_multimap<A, int, custom_hash, custom_compare> >::value));
-
-				assert_is_true((is_associative< unordered_map<int, int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< unordered_map<A, int, custom_hash, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_associative< unordered_multimap<int, int, custom_hash, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< unordered_multimap<A, int, custom_hash, custom_compare, custom_allocator<A> > >::value));
 			}
 
 

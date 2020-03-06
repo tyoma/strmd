@@ -25,8 +25,6 @@
 #include <map>
 #include <set>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 //namespace std
@@ -92,10 +90,6 @@ namespace strmd
 	template <typename T, typename CompT, typename A> struct is_container< std::multiset<T, CompT, A> > { static const bool value = true; };
 	template <typename KeyT, typename T, typename CompT, typename A> struct is_container< std::map<KeyT, T, CompT, A> > { static const bool value = true; };
 	template <typename KeyT, typename T, typename CompT, typename A> struct is_container< std::multimap<KeyT, T, CompT, A> > { static const bool value = true; };
-	template <typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_set<T, HashT, CompT, A> > { static const bool value = true; };
-	template <typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_multiset<T, HashT, CompT, A> > { static const bool value = true; };
-	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_map<KeyT, T, HashT, CompT, A> > { static const bool value = true; };
-	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_multimap<KeyT, T, HashT, CompT, A> > { static const bool value = true; };
 
 
 	template <typename T, bool is_container_ = is_container<T>::value> struct is_associative;

@@ -15,11 +15,11 @@ namespace strmd
 	{
 		namespace
 		{
-			struct custom_hash
+			struct custom_compare
 			{
 				template <typename T>
-				size_t operator ()(const T &value) const
-				{	return hash<T>()(value);	}
+				bool operator ()(const T &lhs, const T &rhs) const
+				{	return lhs < rhs;	}
 			};
 		}
 
@@ -188,8 +188,8 @@ namespace strmd
 				};
 				buffer_reader r(buffer);
 				deserializer<buffer_reader> d(r);
-				unordered_map<char, unsigned short> ucus;
-				unordered_map<unsigned short, int, custom_hash> uusi;
+				map<char, unsigned short> ucus;
+				map<unsigned short, int, custom_compare> uusi;
 
 				// ACT
 				d(ucus);
@@ -198,12 +198,12 @@ namespace strmd
 				// ASSERT
 				pair<char, unsigned short> reference1[] = {
 					make_pair('a', static_cast<unsigned short>(0x1310)),
-               make_pair('c', static_cast<unsigned short>(0x1000)),
-               make_pair('Z', static_cast<unsigned short>(0x0030)),
+					make_pair('c', static_cast<unsigned short>(0x1000)),
+					make_pair('Z', static_cast<unsigned short>(0x0030)),
 				};
 				pair<unsigned short, int> reference2[] = {
 					make_pair(static_cast<unsigned short>(0x1234), 0x11100000),
-               make_pair(static_cast<unsigned short>(0x2143), 0x11000010),
+					make_pair(static_cast<unsigned short>(0x2143), 0x11000010),
 				};
 
 				assert_equivalent(reference1, (vector< pair<char, unsigned short> >(ucus.begin(), ucus.end())));
@@ -221,7 +221,7 @@ namespace strmd
 				};
 				buffer_reader r(buffer);
 				deserializer<buffer_reader> d(r);
-				unordered_map<char, unsigned short> ucus;
+				map<char, unsigned short> ucus;
 				vector<unsigned short> vus;
 
 				// ACT / ASSERT
@@ -231,8 +231,8 @@ namespace strmd
 				// ASSERT
 				pair<char, unsigned short> reference1[] = {
 					make_pair('a', static_cast<unsigned short>(0x1310)),
-               make_pair('c', static_cast<unsigned short>(0x1000)),
-               make_pair('Z', static_cast<unsigned short>(0x0030)),
+					make_pair('c', static_cast<unsigned short>(0x1000)),
+					make_pair('Z', static_cast<unsigned short>(0x0030)),
 				};
 				unsigned short reference2[] = {
 					0x1134, 0x3012,
@@ -252,7 +252,7 @@ namespace strmd
 				};
 				buffer_reader r(buffer);
 				deserializer<buffer_reader> d(r);
-				unordered_map<char, unsigned short> ucus;
+				map<char, unsigned short> ucus;
 				vector<unsigned short> vs(4);
 
 				ucus[3] = 22;
