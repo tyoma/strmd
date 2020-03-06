@@ -117,12 +117,14 @@ namespace strmd
 	struct as_container
 	{
 		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
+		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &, T &, ContextT &) { }
 	};
 
 	template <>
 	struct as_container<true>
 	{
 		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_container(data); }
+		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &a, T &data, ContextT &context) { a.process_container(data, context); }
 	};
 
 
@@ -130,17 +132,19 @@ namespace strmd
 	struct as_regular
 	{
 		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
+		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &, T &, ContextT &) { }
 	};
 
 	template <>
 	struct as_regular<true>
 	{
 		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_regular(data); }
+		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &a, T &data, ContextT &context) { a.process_regular(data, context); }
 	};
 
 
-	template <typename ArchiveT, typename T1, typename T2>
-	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data)
+	template <typename ArchiveT, /*typename ContextT, */typename T1, typename T2>
+	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data, unsigned /*version*/)
 	{
 		archive(data.first);
 		archive(data.second);

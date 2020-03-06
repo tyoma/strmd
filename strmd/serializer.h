@@ -34,20 +34,34 @@ namespace strmd
 		template <typename T>
 		void operator ()(const T &data);
 
-		template <typename T>
-		void process_arithmetic(T data);
-
-		template <typename ContainerT>
-		void process_container(const ContainerT &data);
-
-		template <typename T>
-		void process_regular(const T &data);
+		template <typename T, typename ContextT>
+		void operator ()(const T &data, ContextT &context);
 
 	private:
 		void operator =(const serializer &other);
 
+		template <typename T>
+		void process_arithmetic(T data);
+
+		template <typename T>
+		void process_container(const T &data);
+
+		template <typename T, typename ContextT>
+		void process_container(const T &data, ContextT &context);
+
+		template <typename T>
+		void process_regular(const T &data);
+
+		template <typename T, typename ContextT>
+		void process_regular(const T &data, ContextT &context);
+
 	private:
 		StreamT &_stream;
+
+	private:
+		template <bool> friend struct as_arithmetic;
+		template <bool> friend struct as_container;
+		template <bool> friend struct as_regular;
 	};
 
 
@@ -66,21 +80,44 @@ namespace strmd
 	}
 
 	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void serializer<StreamT, PackerT>::operator ()(const T &data, ContextT &context)
+	{
+		as_arithmetic<is_arithmetic<T>::value>::process(*this, data/*, context is not applicable here*/);
+		as_container<is_container<T>::value>::process(*this, data, context);
+		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data, context);
+	}
+
+	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void serializer<StreamT, PackerT>::process_arithmetic(T data)
 	{	PackerT::pack(_stream, data);	}
 
 	template <typename StreamT, typename PackerT>
-	template <typename ContainerT>
-	inline void serializer<StreamT, PackerT>::process_container(const ContainerT &data)
+	template <typename T>
+	inline void serializer<StreamT, PackerT>::process_container(const T &data)
 	{
 		(*this)(static_cast<unsigned int>(data.size()));
-		for (typename ContainerT::const_iterator i = data.begin(); i != data.end(); ++i)
+		for (typename T::const_iterator i = data.begin(); i != data.end(); ++i)
 			(*this)(*i);
+	}
+
+	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void serializer<StreamT, PackerT>::process_container(const T &data, ContextT &context)
+	{
+		(*this)(static_cast<unsigned int>(data.size()));
+		for (typename T::const_iterator i = data.begin(); i != data.end(); ++i)
+			(*this)(*i, context);
 	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void serializer<StreamT, PackerT>::process_regular(const T &data)
-	{	serialize(*this, const_cast<T &>(data));	}
+	{	serialize(*this, const_cast<T &>(data), 0u);	}
+
+	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void serializer<StreamT, PackerT>::process_regular(const T &data, ContextT &context)
+	{	serialize(*this, const_cast<T &>(data), 0u, context);	}
 }

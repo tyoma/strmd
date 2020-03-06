@@ -45,6 +45,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CrossSerializationTests.cpp" />
     <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="PackerTests.cpp" />
     <ClCompile Include="SerializerTests.cpp" />

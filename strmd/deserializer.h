@@ -34,20 +34,31 @@ namespace strmd
 		template <typename T>
 		void operator ()(T &data);
 
-		template <typename T>
-		void process_arithmetic(T &data);
+		template <typename T, typename ContextT>
+		void operator ()(T &data, ContextT &context);
 
 		template <typename T>
 		size_t process_container(T &data);
 
-		template <typename T>
-		void process_regular(T &data);
-
 	private:
 		void operator =(const deserializer &other);
 
+		template <typename T>
+		void process_arithmetic(T &data);
+
+		template <typename T>
+		void process_regular(T &data);
+
+		template <typename T, typename ContextT>
+		void process_regular(T &data, ContextT &context);
+
 	private:
 		StreamT &_stream;
+
+	private:
+		template <bool> friend struct as_arithmetic;
+		template <bool> friend struct as_container;
+		template <bool> friend struct as_regular;
 	};
 
 	template < typename ContainerT, bool is_associative_ = is_associative<ContainerT>::value >
@@ -101,6 +112,13 @@ namespace strmd
 	}
 
 	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void deserializer<StreamT, PackerT>::operator ()(T &data, ContextT &context)
+	{
+		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data, context);
+	}
+
+	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void deserializer<StreamT, PackerT>::process_arithmetic(T &data)
 	{	PackerT::unpack(_stream, data);	}
@@ -120,5 +138,10 @@ namespace strmd
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void deserializer<StreamT, PackerT>::process_regular(T &data)
-	{	serialize(*this, data);	}
+	{	serialize(*this, data, 0u);	}
+
+	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void deserializer<StreamT, PackerT>::process_regular(T &data, ContextT &context)
+	{	serialize(*this, data, 0u, context);	}
 }

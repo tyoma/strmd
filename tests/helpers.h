@@ -27,7 +27,8 @@ namespace strmd
 		private:
 			std::vector<unsigned char> &_buffer;
 		};
-		
+
+
 		class buffer_reader
 		{
 		public:
@@ -47,6 +48,30 @@ namespace strmd
 		private:
 			const unsigned char *_ptr;
 			size_t _remaining;
+		};
+
+
+		class vector_reader
+		{
+		public:
+			vector_reader(const std::vector<unsigned char> &buffer)
+				: _buffer(buffer), _ptr(0)
+			{	}
+
+			void read(void *data, size_t size)
+			{
+				assert_is_true(size <= _buffer.size() - _ptr);
+				if (size)
+					std::memcpy(data, &_buffer[_ptr], size);
+				_ptr += size;
+			}
+
+		private:
+			void operator =(const vector_reader &rhs);
+
+		private:
+			const std::vector<unsigned char> &_buffer;
+			size_t _ptr;
 		};
 	}
 }
