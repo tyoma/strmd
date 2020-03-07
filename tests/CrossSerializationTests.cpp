@@ -20,11 +20,11 @@ namespace strmd
 	}
 
 	template <typename ArchiveT, typename T1>
-	inline void serialize(ArchiveT &archive, std::pair<T1, string> &data, unsigned /*version*/, wstring &context)
+	inline void serialize(ArchiveT &archive, std::pair<T1, string> &data, unsigned /*version*/, long &context)
 	{
 		archive(data.first);
 		archive(data.second);
-		context.insert(context.end(), data.second.begin(), data.second.end());
+		context += data.second.size();
 	}
 
 	template <typename ArchiveT, typename T1>
@@ -33,6 +33,22 @@ namespace strmd
 		archive(data.first);
 		archive(data.second);
 		context = data.first;
+	}
+
+	template <typename ArchiveT, typename ContextT>
+	inline void serialize(ArchiveT &archive, std::pair<string, int> &data, unsigned /*version*/, ContextT &context)
+	{
+		archive(data.first);
+		archive(data.second);
+		context.push_back(data.first);
+	}
+
+	template <typename ArchiveT>
+	inline void serialize(ArchiveT &archive, std::pair<int, int> &data, unsigned /*version*/, unsigned long long &context)
+	{
+		archive(data.first);
+		archive(data.second);
+		context += data.first + data.second;
 	}
 
 	namespace tests
@@ -97,7 +113,7 @@ namespace strmd
 			}
 
 
-			test( NormallySerializedCanBeContextuallyDeserialized )
+			test( NormallySerializedObjectsCanBeContextuallyDeserialized )
 			{
 				// INIT
 				vector_writer w(buffer);
@@ -161,7 +177,7 @@ namespace strmd
 				vector_reader r(buffer);
 				serializer<vector_writer> s(w);
 				deserializer<vector_reader> d(r);
-				wstring scontext;
+				long lcontext = 0;
 				int icontext;
 				pair<int, string> reference1_[] = {
 					make_pair(112, "one two"), make_pair(113, "lorem"), make_pair(7, "ipsum"),
@@ -177,14 +193,14 @@ namespace strmd
 				vector<int> reference3(mkvector(reference3_));
 
 				// ACT
-				s(reference1, scontext);
+				s(reference1, lcontext);
 
 				// ASSERT
 				vector< pair<int, string> > read1;
 
 				d(read1);
 				assert_equal(reference1_, read1);
-				assert_equal(L"one twoloremipsum", scontext);
+				assert_equal(17, lcontext);
 
 				// ACT
 				s(reference2, icontext);
@@ -208,6 +224,57 @@ namespace strmd
 				d(read3);
 				assert_equal(reference3_, read3);
 				assert_equal(13828245, icontext);
+			}
+
+
+			test( NormallySerializedContainerCanBeContextuallyDeserialized )
+			{
+				// INIT
+				vector_writer w(buffer);
+				vector_reader r(buffer);
+				serializer<vector_writer> s(w);
+				deserializer<vector_reader> d(r);
+				unsigned long long ullcontext = 123;
+				vector<string> vcontext;
+				pair<string, int> reference1_[] = {
+					make_pair("chapel", 1), make_pair("went", 1), make_pair("jingle", 2), make_pair("jangle", 3),
+				};
+				pair<int, int> reference2_[] = {
+					make_pair(1, 11), make_pair(21, 1211), make_pair(11121111, 1),
+				};
+				vector< pair<string, int> >reference1(mkvector(reference1_)), read1;
+				vector< pair<int, int> > reference2(mkvector(reference2_)), read2;
+				map<string, int> read3;
+
+				s(reference1);
+
+				// ACT
+				d(read1, vcontext);
+
+				// ASSERT
+				string reference_vcontext[] = { "chapel", "went", "jingle", "jangle", };
+
+				assert_equal(reference1, read1);
+				assert_equal(reference_vcontext, vcontext);
+
+				// INIT
+				s(reference2);
+
+				// ACT
+				d(read2, ullcontext);
+
+				// ASSERT
+				assert_equal(reference2, read2);
+				assert_equal(123 + 1 + 11 + 21 + 1211 + 11121111 + 1, ullcontext);
+
+				// INIT
+				s(reference1);
+
+				// ACT
+				d(read3, vcontext);
+
+				// ASSERT
+				assert_equivalent(reference1_, read3);
 			}
 
 		end_test_suite

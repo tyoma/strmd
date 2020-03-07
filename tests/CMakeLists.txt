@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 include(test)
 
 set(STRMD_TEST_SOURCES
+	CrossSerializationTests.cpp
 	DeserializerTests.cpp
 	PackerTests.cpp
 	SerializerTests.cpp
