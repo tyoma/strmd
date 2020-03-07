@@ -20,8 +20,8 @@
 
 #pragma once
 
+#include "container.h"
 #include "packer.h"
-#include "type_traits.h"
 
 namespace strmd
 {
@@ -75,8 +75,8 @@ namespace strmd
 	inline void serializer<StreamT, PackerT>::operator ()(const T &data)
 	{
 		as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
-		as_container<is_container<T>::value>::process(*this, data);
-		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data);
+		as_container<container_traits<T>::is_container>::process(*this, data);
+		as_regular<!is_arithmetic<T>::value && !container_traits<T>::is_container>::process(*this, data);
 	}
 
 	template <typename StreamT, typename PackerT>
@@ -84,8 +84,8 @@ namespace strmd
 	inline void serializer<StreamT, PackerT>::operator ()(const T &data, ContextT &context)
 	{
 		as_arithmetic<is_arithmetic<T>::value>::process(*this, data/*, context is not applicable here*/);
-		as_container<is_container<T>::value>::process(*this, data, context);
-		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data, context);
+		as_container<container_traits<T>::is_container>::process(*this, data, context);
+		as_regular<!is_arithmetic<T>::value && !container_traits<T>::is_container>::process(*this, data, context);
 	}
 
 	template <typename StreamT, typename PackerT>

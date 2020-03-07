@@ -28,7 +28,13 @@
     <ClInclude Include="..\strmd\packer.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\strmd\type_traits_ex.h">
+    <ClInclude Include="..\strmd\container.h">
+      <Filter>Library Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\strmd\container_ex.h">
+      <Filter>Library Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\strmd\utility.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
   </ItemGroup>

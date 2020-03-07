@@ -53,11 +53,13 @@
     <ClCompile Include="TypeTraitsTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\strmd\container.h" />
+    <ClInclude Include="..\strmd\container_ex.h" />
     <ClInclude Include="..\strmd\deserializer.h" />
     <ClInclude Include="..\strmd\packer.h" />
     <ClInclude Include="..\strmd\serializer.h" />
     <ClInclude Include="..\strmd\type_traits.h" />
-    <ClInclude Include="..\strmd\type_traits_ex.h" />
+    <ClInclude Include="..\strmd\utility.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>

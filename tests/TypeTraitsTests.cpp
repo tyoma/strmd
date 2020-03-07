@@ -1,4 +1,4 @@
-#include <strmd/type_traits.h>
+#include <strmd/container.h>
 
 #include "helpers.h"
 #include "types.h"
@@ -36,128 +36,128 @@ namespace strmd
 			test( NonContainerTypesAreDetectedAsSuch )
 			{
 				// INIT / ACT / ASSERT
-				assert_is_false((is_container<int>::value));
-				assert_is_false((is_container<char>::value));
-				assert_is_false((is_container<A>::value));
-				assert_is_false((is_container< pair<A, int> >::value));
+				assert_is_false((container_traits<int>::is_container));
+				assert_is_false((container_traits<char>::is_container));
+				assert_is_false((container_traits<A>::is_container));
+				assert_is_false((container_traits< pair<A, int> >::is_container));
 			}
 
 
 			test( StandardSequentialContainersAreDetectedAsContainers )
 			{
 				// INIT / ACT / ASSERT
-				assert_is_true(is_container< vector<int> >::value);
-				assert_is_true(is_container< vector<A> >::value);
-				assert_is_true(is_container< list<int> >::value);
-				assert_is_true(is_container< list<A> >::value);
-				assert_is_true(is_container< deque<int> >::value);
-				assert_is_true(is_container< deque<A> >::value);
-				assert_is_true(is_container< basic_string<int> >::value);
-				assert_is_true(is_container< basic_string<A> >::value);
+				assert_is_true(container_traits< vector<int> >::is_container);
+				assert_is_true(container_traits< vector<A> >::is_container);
+				assert_is_true(container_traits< list<int> >::is_container);
+				assert_is_true(container_traits< list<A> >::is_container);
+				assert_is_true(container_traits< deque<int> >::is_container);
+				assert_is_true(container_traits< deque<A> >::is_container);
+				assert_is_true(container_traits< basic_string<int> >::is_container);
+				assert_is_true(container_traits< basic_string<A> >::is_container);
 
-				assert_is_true((is_container< basic_string< int, char_traits<int> > >::value));
-				assert_is_true((is_container< basic_string< A, char_traits<A> > >::value));
+				assert_is_true((container_traits< basic_string< int, char_traits<int> > >::is_container));
+				assert_is_true((container_traits< basic_string< A, char_traits<A> > >::is_container));
 
-				assert_is_true((is_container< vector< int, custom_allocator<int> > >::value));
-				assert_is_true((is_container< vector< A, custom_allocator<A> > >::value));
-				assert_is_true((is_container< list< int, custom_allocator<int> > >::value));
-				assert_is_true((is_container< list< A, custom_allocator<A> > >::value));
-				assert_is_true((is_container< deque< int, custom_allocator<int> > >::value));
-				assert_is_true((is_container< deque< A, custom_allocator<A> > >::value));
-				assert_is_true((is_container< basic_string< int, char_traits<int>, custom_allocator<int> > >::value));
-				assert_is_true((is_container< basic_string< A, char_traits<A>, custom_allocator<A> > >::value));
+				assert_is_true((container_traits< vector< int, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< vector< A, custom_allocator<A> > >::is_container));
+				assert_is_true((container_traits< list< int, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< list< A, custom_allocator<A> > >::is_container));
+				assert_is_true((container_traits< deque< int, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< deque< A, custom_allocator<A> > >::is_container));
+				assert_is_true((container_traits< basic_string< int, char_traits<int>, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< basic_string< A, char_traits<A>, custom_allocator<A> > >::is_container));
 
 
-				assert_is_false(is_associative< vector<int> >::value);
-				assert_is_false(is_associative< vector<A> >::value);
-				assert_is_false(is_associative< list<int> >::value);
-				assert_is_false(is_associative< list<A> >::value);
-				assert_is_false(is_associative< deque<int> >::value);
-				assert_is_false(is_associative< deque<A> >::value);
-				assert_is_false(is_associative< basic_string<int> >::value);
-				assert_is_false(is_associative< basic_string<A> >::value);
+				//assert_is_false(is_associative< vector<int> >::is_container);
+				//assert_is_false(is_associative< vector<A> >::is_container);
+				//assert_is_false(is_associative< list<int> >::is_container);
+				//assert_is_false(is_associative< list<A> >::is_container);
+				//assert_is_false(is_associative< deque<int> >::is_container);
+				//assert_is_false(is_associative< deque<A> >::is_container);
+				//assert_is_false(is_associative< basic_string<int> >::is_container);
+				//assert_is_false(is_associative< basic_string<A> >::is_container);
 
-				assert_is_false((is_associative< basic_string< int, char_traits<int> > >::value));
-				assert_is_false((is_associative< basic_string< A, char_traits<A> > >::value));
+				//assert_is_false((is_associative< basic_string< int, char_traits<int> > >::is_container));
+				//assert_is_false((is_associative< basic_string< A, char_traits<A> > >::is_container));
 
-				assert_is_false((is_associative< vector< int, custom_allocator<int> > >::value));
-				assert_is_false((is_associative< vector< A, custom_allocator<A> > >::value));
-				assert_is_false((is_associative< list< int, custom_allocator<int> > >::value));
-				assert_is_false((is_associative< list< A, custom_allocator<A> > >::value));
-				assert_is_false((is_associative< deque< int, custom_allocator<int> > >::value));
-				assert_is_false((is_associative< deque< A, custom_allocator<A> > >::value));
-				assert_is_false((is_associative< basic_string< int, char_traits<int>, custom_allocator<int> > >::value));
-				assert_is_false((is_associative< basic_string< A, char_traits<A>, custom_allocator<A> > >::value));
+				//assert_is_false((is_associative< vector< int, custom_allocator<int> > >::is_container));
+				//assert_is_false((is_associative< vector< A, custom_allocator<A> > >::is_container));
+				//assert_is_false((is_associative< list< int, custom_allocator<int> > >::is_container));
+				//assert_is_false((is_associative< list< A, custom_allocator<A> > >::is_container));
+				//assert_is_false((is_associative< deque< int, custom_allocator<int> > >::is_container));
+				//assert_is_false((is_associative< deque< A, custom_allocator<A> > >::is_container));
+				//assert_is_false((is_associative< basic_string< int, char_traits<int>, custom_allocator<int> > >::is_container));
+				//assert_is_false((is_associative< basic_string< A, char_traits<A>, custom_allocator<A> > >::is_container));
 		}
 
 
 			test( StandardAssociativeSetContainersAreDetectedAsContainers )
 			{
 				// INIT / ACT / ASSERT
-				assert_is_true(is_container< set<int> >::value);
-				assert_is_true(is_container< set<A> >::value);
-				assert_is_true(is_container< multiset<int> >::value);
-				assert_is_true(is_container< multiset<A> >::value);
+				assert_is_true(container_traits< set<int> >::is_container);
+				assert_is_true(container_traits< set<A> >::is_container);
+				assert_is_true(container_traits< multiset<int> >::is_container);
+				assert_is_true(container_traits< multiset<A> >::is_container);
 
-				assert_is_true((is_container< set<int, custom_compare> >::value));
-				assert_is_true((is_container< set<A, custom_compare> >::value));
-				assert_is_true((is_container< multiset<int, custom_compare> >::value));
-				assert_is_true((is_container< multiset<A, custom_compare> >::value));
+				assert_is_true((container_traits< set<int, custom_compare> >::is_container));
+				assert_is_true((container_traits< set<A, custom_compare> >::is_container));
+				assert_is_true((container_traits< multiset<int, custom_compare> >::is_container));
+				assert_is_true((container_traits< multiset<A, custom_compare> >::is_container));
 
-				assert_is_true((is_container< set<int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< set<A, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_container< multiset<int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< multiset<A, custom_compare, custom_allocator<A> > >::value));
+				assert_is_true((container_traits< set<int, custom_compare, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< set<A, custom_compare, custom_allocator<A> > >::is_container));
+				assert_is_true((container_traits< multiset<int, custom_compare, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< multiset<A, custom_compare, custom_allocator<A> > >::is_container));
 
-				assert_is_true(is_associative< set<int> >::value);
-				assert_is_true(is_associative< set<A> >::value);
-				assert_is_true(is_associative< multiset<int> >::value);
-				assert_is_true(is_associative< multiset<A> >::value);
+				//assert_is_true(is_associative< set<int> >::is_container);
+				//assert_is_true(is_associative< set<A> >::is_container);
+				//assert_is_true(is_associative< multiset<int> >::is_container);
+				//assert_is_true(is_associative< multiset<A> >::is_container);
 
-				assert_is_true((is_associative< set<int, custom_compare> >::value));
-				assert_is_true((is_associative< set<A, custom_compare> >::value));
-				assert_is_true((is_associative< multiset<int, custom_compare> >::value));
-				assert_is_true((is_associative< multiset<A, custom_compare> >::value));
+				//assert_is_true((is_associative< set<int, custom_compare> >::is_container));
+				//assert_is_true((is_associative< set<A, custom_compare> >::is_container));
+				//assert_is_true((is_associative< multiset<int, custom_compare> >::is_container));
+				//assert_is_true((is_associative< multiset<A, custom_compare> >::is_container));
 
-				assert_is_true((is_associative< set<int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< set<A, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_associative< multiset<int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< multiset<A, custom_compare, custom_allocator<A> > >::value));
+				//assert_is_true((is_associative< set<int, custom_compare, custom_allocator<int> > >::is_container));
+				//assert_is_true((is_associative< set<A, custom_compare, custom_allocator<A> > >::is_container));
+				//assert_is_true((is_associative< multiset<int, custom_compare, custom_allocator<int> > >::is_container));
+				//assert_is_true((is_associative< multiset<A, custom_compare, custom_allocator<A> > >::is_container));
 			}
 
 
 			test( StandardAssociativeMapContainersAreDetectedAsContainers )
 			{
 				// INIT / ACT / ASSERT
-				assert_is_true((is_container< map<int, int> >::value));
-				assert_is_true((is_container< map<A, int> >::value));
-				assert_is_true((is_container< multimap<int, int> >::value));
-				assert_is_true((is_container< multimap<A, int> >::value));
+				assert_is_true((container_traits< map<int, int> >::is_container));
+				assert_is_true((container_traits< map<A, int> >::is_container));
+				assert_is_true((container_traits< multimap<int, int> >::is_container));
+				assert_is_true((container_traits< multimap<A, int> >::is_container));
 
-				assert_is_true((is_container< map<int, int, custom_compare> >::value));
-				assert_is_true((is_container< map<A, int, custom_compare> >::value));
-				assert_is_true((is_container< multimap<int, int, custom_compare> >::value));
-				assert_is_true((is_container< multimap<A, int, custom_compare> >::value));
+				assert_is_true((container_traits< map<int, int, custom_compare> >::is_container));
+				assert_is_true((container_traits< map<A, int, custom_compare> >::is_container));
+				assert_is_true((container_traits< multimap<int, int, custom_compare> >::is_container));
+				assert_is_true((container_traits< multimap<A, int, custom_compare> >::is_container));
 
-				assert_is_true((is_container< map<int, int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< map<A, int, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_container< multimap<int, int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_container< multimap<A, int, custom_compare, custom_allocator<A> > >::value));
+				assert_is_true((container_traits< map<int, int, custom_compare, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< map<A, int, custom_compare, custom_allocator<A> > >::is_container));
+				assert_is_true((container_traits< multimap<int, int, custom_compare, custom_allocator<int> > >::is_container));
+				assert_is_true((container_traits< multimap<A, int, custom_compare, custom_allocator<A> > >::is_container));
 
-				assert_is_true((is_associative< map<int, int> >::value));
-				assert_is_true((is_associative< map<A, int> >::value));
-				assert_is_true((is_associative< multimap<int, int> >::value));
-				assert_is_true((is_associative< multimap<A, int> >::value));
+				//assert_is_true((is_associative< map<int, int> >::is_container));
+				//assert_is_true((is_associative< map<A, int> >::is_container));
+				//assert_is_true((is_associative< multimap<int, int> >::is_container));
+				//assert_is_true((is_associative< multimap<A, int> >::is_container));
 
-				assert_is_true((is_associative< map<int, int, custom_compare> >::value));
-				assert_is_true((is_associative< map<A, int, custom_compare> >::value));
-				assert_is_true((is_associative< multimap<int, int, custom_compare> >::value));
-				assert_is_true((is_associative< multimap<A, int, custom_compare> >::value));
+				//assert_is_true((is_associative< map<int, int, custom_compare> >::is_container));
+				//assert_is_true((is_associative< map<A, int, custom_compare> >::is_container));
+				//assert_is_true((is_associative< multimap<int, int, custom_compare> >::is_container));
+				//assert_is_true((is_associative< multimap<A, int, custom_compare> >::is_container));
 
-				assert_is_true((is_associative< map<int, int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< map<A, int, custom_compare, custom_allocator<A> > >::value));
-				assert_is_true((is_associative< multimap<int, int, custom_compare, custom_allocator<int> > >::value));
-				assert_is_true((is_associative< multimap<A, int, custom_compare, custom_allocator<A> > >::value));
+				//assert_is_true((is_associative< map<int, int, custom_compare, custom_allocator<int> > >::is_container));
+				//assert_is_true((is_associative< map<A, int, custom_compare, custom_allocator<A> > >::is_container));
+				//assert_is_true((is_associative< multimap<int, int, custom_compare, custom_allocator<int> > >::is_container));
+				//assert_is_true((is_associative< multimap<A, int, custom_compare, custom_allocator<A> > >::is_container));
 			}
 
 

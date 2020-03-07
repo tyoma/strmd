@@ -20,26 +20,6 @@
 
 #pragma once
 
-#include <deque>
-#include <list>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
-
-//namespace std
-//{
-//	template <typename T, typename TraitsT, typename A> class basic_string;
-//	template <typename T, typename A> class deque;
-//	template <typename T, typename A> class list;
-//	template <typename T, typename A> class vector;
-
-//	template<typename T, typename CompT, typename A> class set;
-//	template<typename T, typename CompT, typename A> class multiset;
-//	template<typename KeyT, typename T, typename CompT, typename A> class map;
-//	template<typename KeyT, typename T, typename CompT, typename A> class multimap;
-//}
-
 namespace strmd
 {
 	template <typename T> struct is_arithmetic { static const bool value = false; };
@@ -78,26 +58,9 @@ namespace strmd
 
 	template <typename T> struct remove_const { typedef T type; };
 	template <typename T> struct remove_const<const T> { typedef typename remove_const<T>::type type; };
-	template <typename T1, typename T2> struct remove_const< std::pair<T1, T2> > { typedef std::pair<typename remove_const<T1>::type, typename remove_const<T2>::type> type; };
 
 
-	template <typename T> struct is_container { static const bool value = false; };
-	template <typename T, typename TraitsT, typename A> struct is_container< std::basic_string<T, TraitsT, A> > { static const bool value = true; };
-	template <typename T, typename A> struct is_container< std::deque<T, A> > { static const bool value = true; };
-	template <typename T, typename A> struct is_container< std::list<T, A> > { static const bool value = true; };
-	template <typename T, typename A> struct is_container< std::vector<T, A> > { static const bool value = true; };
-	template <typename T, typename CompT, typename A> struct is_container< std::set<T, CompT, A> > { static const bool value = true; };
-	template <typename T, typename CompT, typename A> struct is_container< std::multiset<T, CompT, A> > { static const bool value = true; };
-	template <typename KeyT, typename T, typename CompT, typename A> struct is_container< std::map<KeyT, T, CompT, A> > { static const bool value = true; };
-	template <typename KeyT, typename T, typename CompT, typename A> struct is_container< std::multimap<KeyT, T, CompT, A> > { static const bool value = true; };
-
-
-	template <typename T, bool is_container_ = is_container<T>::value> struct is_associative;
-	template <typename T> struct is_associative<T, true> { static const bool value = true; };
-	template <typename T, typename TraitsT, typename A> struct is_associative<std::basic_string<T, TraitsT, A>, true> { static const bool value = false; };
-	template <typename T, typename A> struct is_associative<std::deque<T, A>, true> { static const bool value = false; };
-	template <typename T, typename A> struct is_associative<std::list<T, A>, true> { static const bool value = false; };
-	template <typename T, typename A> struct is_associative<std::vector<T, A>, true> { static const bool value = false; };
+	template <typename T> struct container_traits { static const bool is_container = false; };
 
 
 	template <bool enable>
@@ -141,12 +104,4 @@ namespace strmd
 		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_regular(data); }
 		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &a, T &data, ContextT &context) { a.process_regular(data, context); }
 	};
-
-
-	template <typename ArchiveT, /*typename ContextT, */typename T1, typename T2>
-	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data, unsigned /*version*/)
-	{
-		archive(data.first);
-		archive(data.second);
-	}
 }

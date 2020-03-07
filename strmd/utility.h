@@ -22,13 +22,16 @@
 
 #include "type_traits.h"
 
-#include <unordered_map>
-#include <unordered_set>
+#include <utility>
 
 namespace strmd
 {
-	template <typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_set<T, HashT, CompT, A> > { static const bool value = true; };
-	template <typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_multiset<T, HashT, CompT, A> > { static const bool value = true; };
-	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_map<KeyT, T, HashT, CompT, A> > { static const bool value = true; };
-	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct is_container< std::unordered_multimap<KeyT, T, HashT, CompT, A> > { static const bool value = true; };
+	template <typename T1, typename T2> struct remove_const< std::pair<T1, T2> > { typedef std::pair<typename remove_const<T1>::type, typename remove_const<T2>::type> type; };
+
+	template <typename ArchiveT, typename T1, typename T2>
+	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data, unsigned /*version*/)
+	{
+		archive(data.first);
+		archive(data.second);
+	}
 }

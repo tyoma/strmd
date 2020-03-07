@@ -20,8 +20,8 @@
 
 #pragma once
 
+#include "container.h"
 #include "packer.h"
-#include "type_traits.h"
 
 namespace strmd
 {
@@ -37,14 +37,14 @@ namespace strmd
 		template <typename T, typename ContextT>
 		void operator ()(T &data, ContextT &context);
 
-		template <typename T>
-		size_t process_container(T &data);
-
 	private:
 		void operator =(const deserializer &other);
 
 		template <typename T>
 		void process_arithmetic(T &data);
+
+		template <typename T>
+		void process_container(T &data);
 
 		template <typename T, typename ContextT>
 		void process_container(T &data, ContextT &context);
@@ -64,48 +64,6 @@ namespace strmd
 		template <bool> friend struct as_regular;
 	};
 
-	template < typename ContainerT, bool is_associative_ = is_associative<ContainerT>::value >
-	struct container_reader
-	{
-		void prepare(ContainerT &data)
-		{	data.clear();	}
-
-		template <typename ArchiveT>
-		void operator ()(ArchiveT &archive, ContainerT &data) const
-		{
-			typename ContainerT::value_type value;
-			archive(value), data.push_back(value);
-		}
-
-		template <typename ArchiveT, typename ContextT>
-		void operator ()(ArchiveT &archive, ContainerT &data, ContextT &context) const
-		{
-			typename ContainerT::value_type value;
-			archive(value, context), data.push_back(value);
-		}
-	};
-
-	template <typename ContainerT>
-	struct container_reader<ContainerT, true>
-	{
-		void prepare(ContainerT &data)
-		{	data.clear();	}
-
-		template <typename ArchiveT>
-		void operator ()(ArchiveT &archive, ContainerT &data) const
-		{
-			typename remove_const<typename ContainerT::value_type>::type value;
-			archive(value), data.insert(value);
-		}
-
-		template <typename ArchiveT, typename ContextT>
-		void operator ()(ArchiveT &archive, ContainerT &data, ContextT &context)
-		{
-			typename remove_const<typename ContainerT::value_type>::type value;
-			archive(value, context), data.insert(value);
-		}
-	};
-
 
 
 	template <typename StreamT, typename PackerT>
@@ -118,8 +76,8 @@ namespace strmd
 	inline void deserializer<StreamT, PackerT>::operator ()(T &data)
 	{
 		as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
-		as_container<is_container<T>::value>::process(*this, data);
-		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data);
+		as_container<container_traits<T>::is_container>::process(*this, data);
+		as_regular<!is_arithmetic<T>::value && !container_traits<T>::is_container>::process(*this, data);
 	}
 
 	template <typename StreamT, typename PackerT>
@@ -127,8 +85,8 @@ namespace strmd
 	inline void deserializer<StreamT, PackerT>::operator ()(T &data, ContextT &context)
 	{
 		as_arithmetic<is_arithmetic<T>::value>::process(*this, data/*, context is not applicable here*/);
-		as_container<is_container<T>::value>::process(*this, data, context);
-		as_regular<!is_arithmetic<T>::value && !is_container<T>::value>::process(*this, data, context);
+		as_container<container_traits<T>::is_container>::process(*this, data, context);
+		as_regular<!is_arithmetic<T>::value && !container_traits<T>::is_container>::process(*this, data, context);
 	}
 
 	template <typename StreamT, typename PackerT>
@@ -138,16 +96,15 @@ namespace strmd
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline size_t deserializer<StreamT, PackerT>::process_container(T &data)
+	inline void deserializer<StreamT, PackerT>::process_container(T &data)
 	{
 		unsigned int count;
-		container_reader<T> reader;
+		typename container_traits<T>::reader_type reader;
 
 		(*this)(count);
 		reader.prepare(data);
-		for (unsigned int n = count; n--; )
+		while (count--)
 			reader(*this, data);
-		return count;
 	}
 
 	template <typename StreamT, typename PackerT>
@@ -155,7 +112,7 @@ namespace strmd
 	inline void deserializer<StreamT, PackerT>::process_container(T &data, ContextT &context)
 	{
 		unsigned int count;
-		container_reader<T> reader;
+		typename container_traits<T>::reader_type reader;
 
 		(*this)(count);
 		reader.prepare(data);
