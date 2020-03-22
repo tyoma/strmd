@@ -24,7 +24,7 @@ namespace strmd
 	{
 		archive(data.first);
 		archive(data.second);
-		context += data.second.size();
+		context += static_cast<long>(data.second.size());
 	}
 
 	template <typename ArchiveT, typename T1>
