@@ -1,5 +1,7 @@
 #pragma once
 
+#include <strmd/type_traits.h>
+
 #include <cstring>
 #include <ut/assert.h>
 #include <vector>
@@ -8,6 +10,8 @@ namespace strmd
 {
 	namespace tests
 	{
+		enum type_category { is_arithmetic, is_container, is_user_type };
+
 		class vector_writer
 		{
 		public:
@@ -73,5 +77,16 @@ namespace strmd
 			const std::vector<unsigned char> &_buffer;
 			size_t _ptr;
 		};
+
+
+
+		inline type_category category(arithmetic_type_tag)
+		{	return is_arithmetic;	}
+
+		inline type_category category(container_type_tag)
+		{	return is_container;	}
+
+		inline type_category category(user_type_tag)
+		{	return is_user_type;	}
 	}
 }

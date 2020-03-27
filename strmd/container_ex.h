@@ -27,8 +27,8 @@
 
 namespace strmd
 {
-	template <typename T, typename HashT, typename CompT, typename A> struct container_traits< std::unordered_set<T, HashT, CompT, A> > : associative_container_traits { };
-	template <typename T, typename HashT, typename CompT, typename A> struct container_traits< std::unordered_multiset<T, HashT, CompT, A> > : associative_container_traits { };
-	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct container_traits< std::unordered_map<KeyT, T, HashT, CompT, A> > : associative_container_traits { };
-	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct container_traits< std::unordered_multimap<KeyT, T, HashT, CompT, A> > : associative_container_traits { };
+	template <typename T, typename HashT, typename CompT, typename A> struct type_traits< std::unordered_set<T, HashT, CompT, A> > : associative_container_traits { };
+	template <typename T, typename HashT, typename CompT, typename A> struct type_traits< std::unordered_multiset<T, HashT, CompT, A> > : associative_container_traits { };
+	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct type_traits< std::unordered_map<KeyT, T, HashT, CompT, A> > : associative_container_traits { };
+	template <typename KeyT, typename T, typename HashT, typename CompT, typename A> struct type_traits< std::unordered_multimap<KeyT, T, HashT, CompT, A> > : associative_container_traits { };
 }

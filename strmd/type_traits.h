@@ -22,20 +22,25 @@
 
 namespace strmd
 {
-	template <typename T> struct is_arithmetic { static const bool value = false; };
-	template <> struct is_arithmetic<char> { static const bool value = true; };
-	template <> struct is_arithmetic<wchar_t> { static const bool value = true; };
-	template <> struct is_arithmetic<unsigned char> { static const bool value = true; };
-	template <> struct is_arithmetic<short> { static const bool value = true; };
-	template <> struct is_arithmetic<unsigned short> { static const bool value = true; };
-	template <> struct is_arithmetic<int> { static const bool value = true; };
-	template <> struct is_arithmetic<unsigned int> { static const bool value = true; };
-	template <> struct is_arithmetic<long> { static const bool value = true; };
-	template <> struct is_arithmetic<unsigned long> { static const bool value = true; };
-	template <> struct is_arithmetic<long long> { static const bool value = true; };
-	template <> struct is_arithmetic<unsigned long long> { static const bool value = true; };
-	template <> struct is_arithmetic<float> { static const bool value = true; };
-	template <> struct is_arithmetic<double> { static const bool value = true; };
+	struct arithmetic_type_tag {};
+	struct container_type_tag {};
+	struct user_type_tag {};
+
+
+	template <typename T> struct type_traits { typedef user_type_tag /*default*/ category; };
+	template <> struct type_traits<char> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<wchar_t> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<unsigned char> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<short> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<unsigned short> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<int> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<unsigned int> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<long> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<unsigned long> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<long long> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<unsigned long long> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<float> { typedef arithmetic_type_tag category; };
+	template <> struct type_traits<double> { typedef arithmetic_type_tag category; };
 
 
 	template <typename T> struct is_char { static const bool value = false; };
@@ -58,50 +63,4 @@ namespace strmd
 
 	template <typename T> struct remove_const { typedef T type; };
 	template <typename T> struct remove_const<const T> { typedef typename remove_const<T>::type type; };
-
-
-	template <typename T> struct container_traits { static const bool is_container = false; };
-
-
-	template <bool enable>
-	struct as_arithmetic
-	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
-	};
-
-	template <>
-	struct as_arithmetic<true>
-	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_arithmetic(data); }
-	};
-
-
-	template <bool enable>
-	struct as_container
-	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
-		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &, T &, ContextT &) { }
-	};
-
-	template <>
-	struct as_container<true>
-	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_container(data); }
-		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &a, T &data, ContextT &context) { a.process_container(data, context); }
-	};
-
-
-	template <bool enable>
-	struct as_regular
-	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &, T &) { }
-		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &, T &, ContextT &) { }
-	};
-
-	template <>
-	struct as_regular<true>
-	{
-		template <typename ArchiveT, typename T> static void process(ArchiveT &a, T &data) { a.process_regular(data); }
-		template <typename ArchiveT, typename T, typename ContextT> static void process(ArchiveT &a, T &data, ContextT &context) { a.process_regular(data, context); }
-	};
 }

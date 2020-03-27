@@ -41,27 +41,25 @@ namespace strmd
 		void operator =(const deserializer &other);
 
 		template <typename T>
-		void process_arithmetic(T &data);
-
-		template <typename T>
-		void process_container(T &data);
+		void process(T &data, arithmetic_type_tag);
 
 		template <typename T, typename ContextT>
-		void process_container(T &data, ContextT &context);
+		void process(T &data, ContextT &context, arithmetic_type_tag);
 
 		template <typename T>
-		void process_regular(T &data);
+		void process(T &data, container_type_tag);
 
 		template <typename T, typename ContextT>
-		void process_regular(T &data, ContextT &context);
+		void process(T &data, ContextT &context, container_type_tag);
+
+		template <typename T>
+		void process(T &data, user_type_tag);
+
+		template <typename T, typename ContextT>
+		void process(T &data, ContextT &context, user_type_tag);
 
 	private:
 		StreamT &_stream;
-
-	private:
-		template <bool> friend struct as_arithmetic;
-		template <bool> friend struct as_container;
-		template <bool> friend struct as_regular;
 	};
 
 
@@ -74,32 +72,29 @@ namespace strmd
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void deserializer<StreamT, PackerT>::operator ()(T &data)
-	{
-		as_arithmetic<is_arithmetic<T>::value>::process(*this, data);
-		as_container<container_traits<T>::is_container>::process(*this, data);
-		as_regular<!is_arithmetic<T>::value && !container_traits<T>::is_container>::process(*this, data);
-	}
+	{	process(data, typename type_traits<T>::category());	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
 	inline void deserializer<StreamT, PackerT>::operator ()(T &data, ContextT &context)
-	{
-		as_arithmetic<is_arithmetic<T>::value>::process(*this, data/*, context is not applicable here*/);
-		as_container<container_traits<T>::is_container>::process(*this, data, context);
-		as_regular<!is_arithmetic<T>::value && !container_traits<T>::is_container>::process(*this, data, context);
-	}
+	{	process(data, context, typename type_traits<T>::category());	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process_arithmetic(T &data)
+	inline void deserializer<StreamT, PackerT>::process(T &data, arithmetic_type_tag)
+	{	PackerT::unpack(_stream, data);	}
+
+	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &/*context*/, arithmetic_type_tag)
 	{	PackerT::unpack(_stream, data);	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process_container(T &data)
+	inline void deserializer<StreamT, PackerT>::process(T &data, container_type_tag)
 	{
 		unsigned int count;
-		typename container_traits<T>::reader_type reader;
+		typename type_traits<T>::item_reader_type reader;
 
 		(*this)(count);
 		reader.prepare(data);
@@ -109,10 +104,10 @@ namespace strmd
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::process_container(T &data, ContextT &context)
+	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &context, container_type_tag)
 	{
 		unsigned int count;
-		typename container_traits<T>::reader_type reader;
+		typename type_traits<T>::item_reader_type reader;
 
 		(*this)(count);
 		reader.prepare(data);
@@ -122,11 +117,11 @@ namespace strmd
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process_regular(T &data)
+	inline void deserializer<StreamT, PackerT>::process(T &data, user_type_tag)
 	{	serialize(*this, data, 0u);	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::process_regular(T &data, ContextT &context)
+	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &context, user_type_tag)
 	{	serialize(*this, data, 0u, context);	}
 }

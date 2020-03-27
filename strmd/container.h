@@ -76,24 +76,25 @@ namespace strmd
 
 	struct sequence_container_traits
 	{
-		static const bool is_container = true;
-		typedef sequence_container_reader reader_type;
+		typedef container_type_tag category;
+		typedef sequence_container_reader item_reader_type;
 	};
 
 	struct associative_container_traits
 	{
-		static const bool is_container = true;
-		typedef associative_container_reader reader_type;
+		typedef container_type_tag category;
+		typedef associative_container_reader item_reader_type;
 	};
 
 
-	template <typename T, typename TraitsT, typename A> struct container_traits< std::basic_string<T, TraitsT, A> > : sequence_container_traits { };
-	template <typename T, typename A> struct container_traits< std::deque<T, A> > : sequence_container_traits { };
-	template <typename T, typename A> struct container_traits< std::list<T, A> > : sequence_container_traits { };
-	template <typename T, typename A> struct container_traits< std::vector<T, A> > : sequence_container_traits { };
 
-	template <typename T, typename CompT, typename A> struct container_traits< std::set<T, CompT, A> > : associative_container_traits { };
-	template <typename T, typename CompT, typename A> struct container_traits< std::multiset<T, CompT, A> > : associative_container_traits { };
-	template <typename KeyT, typename T, typename CompT, typename A> struct container_traits< std::map<KeyT, T, CompT, A> > : associative_container_traits { };
-	template <typename KeyT, typename T, typename CompT, typename A> struct container_traits< std::multimap<KeyT, T, CompT, A> > : associative_container_traits { };
+	template <typename T, typename TraitsT, typename A> struct type_traits< std::basic_string<T, TraitsT, A> > : sequence_container_traits { };
+	template <typename T, typename A> struct type_traits< std::deque<T, A> > : sequence_container_traits { };
+	template <typename T, typename A> struct type_traits< std::list<T, A> > : sequence_container_traits { };
+	template <typename T, typename A> struct type_traits< std::vector<T, A> > : sequence_container_traits { };
+
+	template <typename T, typename CompT, typename A> struct type_traits< std::set<T, CompT, A> > : associative_container_traits { };
+	template <typename T, typename CompT, typename A> struct type_traits< std::multiset<T, CompT, A> > : associative_container_traits { };
+	template <typename KeyT, typename T, typename CompT, typename A> struct type_traits< std::map<KeyT, T, CompT, A> > : associative_container_traits { };
+	template <typename KeyT, typename T, typename CompT, typename A> struct type_traits< std::multimap<KeyT, T, CompT, A> > : associative_container_traits { };
 }
