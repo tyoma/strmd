@@ -12,7 +12,7 @@ using namespace std;
 namespace strmd
 {
 	template <typename ArchiveT, typename T1, typename T2>
-	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data, unsigned /*version*/, string &context)
+	inline void serialize(ArchiveT &archive, pair<T1, T2> &data, unsigned /*version*/, string &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -20,7 +20,7 @@ namespace strmd
 	}
 
 	template <typename ArchiveT, typename T1>
-	inline void serialize(ArchiveT &archive, std::pair<T1, string> &data, unsigned /*version*/, long &context)
+	inline void serialize(ArchiveT &archive, pair<T1, string> &data, unsigned /*version*/, long &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -28,7 +28,7 @@ namespace strmd
 	}
 
 	template <typename ArchiveT, typename T1>
-	inline void serialize(ArchiveT &archive, std::pair<T1, int> &data, unsigned /*version*/, int &context)
+	inline void serialize(ArchiveT &archive, pair<T1, int> &data, unsigned /*version*/, int &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -36,7 +36,7 @@ namespace strmd
 	}
 
 	template <typename ArchiveT, typename ContextT>
-	inline void serialize(ArchiveT &archive, std::pair<string, int> &data, unsigned /*version*/, ContextT &context)
+	inline void serialize(ArchiveT &archive, pair<string, int> &data, unsigned /*version*/, ContextT &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -44,11 +44,29 @@ namespace strmd
 	}
 
 	template <typename ArchiveT>
-	inline void serialize(ArchiveT &archive, std::pair<int, int> &data, unsigned /*version*/, unsigned long long &context)
+	inline void serialize(ArchiveT &archive, pair<int, int> &data, unsigned /*version*/, unsigned long long &context)
 	{
 		archive(data.first);
 		archive(data.second);
 		context += data.first + data.second;
+	}
+
+	template <typename ArchiveT>
+	inline void serialize(ArchiveT &archive, tests::MyKey &data, unsigned /*version*/,
+		pair< vector<int>, vector<string> > &context)
+	{
+		archive(data.value);
+		context.first.push_back(data.value);
+	}
+
+	template <typename ArchiveT>
+	inline void serialize(ArchiveT &archive, tests::A &data, unsigned /*version*/,
+		pair< vector<int>, vector<string> > &context)
+	{
+		archive(data.a);
+		archive(data.b);
+		archive(data.c);
+		context.second.push_back(data.c);
 	}
 
 	namespace tests
@@ -275,6 +293,59 @@ namespace strmd
 
 				// ASSERT
 				assert_equivalent(reference1_, read3);
+			}
+
+
+			template <typename ContainerT>
+			void ContextIsPassedOnToElementsBeingReadImpl()
+			{
+				// INIT
+				vector_writer w(buffer);
+				vector_reader r(buffer);
+				serializer<vector_writer> s(w);
+				deserializer<vector_reader> d(r);
+				A data[] = { { 0, 0, "foo" }, { 0, 0, "bar" }, { 0, 0, "A" }, { 0, 0, "B" }, { 0, 0, "C" } };
+				pair<MyKey, A> data1[] = { make_pair(1, data[0]), make_pair(111, data[1]), };
+				pair<MyKey, A> data2[] = { make_pair(10, data[2]), make_pair(20, data[3]), make_pair(30, data[4]) };
+				ContainerT container;
+				pair< vector<int>, vector<string> > context;
+
+				s(mkvector(data1));
+				s(mkvector(data2));
+
+				// ACT
+				d(container, context);
+
+				// ASSERT
+				int reference11[] = { 1, 111, };
+				string reference12[] = { "foo", "bar", };
+
+				assert_equal(reference11, context.first);
+				assert_equal(reference12, context.second);
+
+				// INIT
+				context.first.clear();
+				context.second.clear();
+
+				// ACT
+				d(container, context);
+
+				// ASSERT
+				int reference21[] = { 10, 20, 30, };
+				string reference22[] = { "A", "B", "C", };
+
+				assert_equal(reference21, context.first);
+				assert_equal(reference22, context.second);
+			}
+
+			test( ContextIsPassedOnToElementsBeingRead )
+			{
+				ContextIsPassedOnToElementsBeingReadImpl< vector< pair<MyKey, A> > >();
+				ContextIsPassedOnToElementsBeingReadImpl< list< pair<MyKey, A> > >();
+				ContextIsPassedOnToElementsBeingReadImpl< deque< pair<MyKey, A> > >();
+
+				ContextIsPassedOnToElementsBeingReadImpl< map<MyKey, A> >();
+				ContextIsPassedOnToElementsBeingReadImpl< multimap<MyKey, A> >();
 			}
 
 		end_test_suite

@@ -47,10 +47,10 @@ namespace strmd
 		void process(T data, ContextT &context, arithmetic_type_tag);
 
 		template <typename T>
-		void process(const T &data, container_type_tag);
+		void process(const T &container, container_type_tag);
 
 		template <typename T, typename ContextT>
-		void process(const T &data, ContextT &context, container_type_tag);
+		void process(const T &container, ContextT &context, container_type_tag);
 
 		template <typename T>
 		void process(const T &data, user_type_tag);
@@ -90,19 +90,19 @@ namespace strmd
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void serializer<StreamT, PackerT>::process(const T &data, container_type_tag)
+	inline void serializer<StreamT, PackerT>::process(const T &container, container_type_tag)
 	{
-		(*this)(static_cast<unsigned int>(data.size()));
-		for (typename T::const_iterator i = data.begin(); i != data.end(); ++i)
+		(*this)(static_cast<unsigned int>(container.size()));
+		for (typename T::const_iterator i = container.begin(); i != container.end(); ++i)
 			(*this)(*i);
 	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
-	inline void serializer<StreamT, PackerT>::process(const T &data, ContextT &context, container_type_tag)
+	inline void serializer<StreamT, PackerT>::process(const T &container, ContextT &context, container_type_tag)
 	{
-		(*this)(static_cast<unsigned int>(data.size()));
-		for (typename T::const_iterator i = data.begin(); i != data.end(); ++i)
+		(*this)(static_cast<unsigned int>(container.size()));
+		for (typename T::const_iterator i = container.begin(); i != container.end(); ++i)
 			(*this)(*i, context);
 	}
 

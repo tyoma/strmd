@@ -7,6 +7,7 @@
     <ClCompile Include="PackerTests.cpp" />
     <ClCompile Include="TypeTraitsExTests.cpp" />
     <ClCompile Include="CrossSerializationTests.cpp" />
+    <ClCompile Include="ContainerDeserializationTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library Headers">

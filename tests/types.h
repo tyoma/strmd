@@ -25,6 +25,18 @@ namespace strmd
 			unsigned char b;
 		};
 
+		struct MyKey
+		{
+			MyKey(int v = 0)
+				: value(v)
+			{	}
+
+			int value;
+
+			bool operator <(MyKey rhs) const
+			{	return value < rhs.value;	}
+		};
+
 		template <typename ArchiveT>
 		inline void serialize(ArchiveT &archive, A &v, unsigned /*version*/)
 		{
@@ -46,5 +58,9 @@ namespace strmd
 			archive(v.b);
 			archive(v.a);
 		}
+
+		template <typename ArchiveT>
+		inline void serialize(ArchiveT &archive, MyKey &v, unsigned /*version*/)
+		{	archive(v.value);	}
 	}
 }

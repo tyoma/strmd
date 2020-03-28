@@ -47,10 +47,10 @@ namespace strmd
 		void process(T &data, ContextT &context, arithmetic_type_tag);
 
 		template <typename T>
-		void process(T &data, container_type_tag);
+		void process(T &container, container_type_tag);
 
 		template <typename T, typename ContextT>
-		void process(T &data, ContextT &context, container_type_tag);
+		void process(T &container, ContextT &context, container_type_tag);
 
 		template <typename T>
 		void process(T &data, user_type_tag);
@@ -91,28 +91,30 @@ namespace strmd
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process(T &data, container_type_tag)
+	inline void deserializer<StreamT, PackerT>::process(T &container, container_type_tag)
 	{
 		unsigned int count;
 		typename type_traits<T>::item_reader_type reader;
 
 		(*this)(count);
-		reader.prepare(data);
+		reader.prepare(container, count);
 		while (count--)
-			reader(*this, data);
+			reader.read_item(*this, container);
+		reader.complete(container);
 	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &context, container_type_tag)
+	inline void deserializer<StreamT, PackerT>::process(T &container, ContextT &context, container_type_tag)
 	{
 		unsigned int count;
 		typename type_traits<T>::item_reader_type reader;
 
 		(*this)(count);
-		reader.prepare(data);
+		reader.prepare(container, count);
 		while (count--)
-			reader(*this, data, context);
+			reader.read_item(*this, container, context);
+		reader.complete(container);
 	}
 
 	template <typename StreamT, typename PackerT>

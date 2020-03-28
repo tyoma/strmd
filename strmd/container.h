@@ -31,45 +31,65 @@
 
 namespace strmd
 {
-	struct sequence_container_reader
+	struct container_reader_base
 	{
 		template <typename ContainerT>
-		void prepare(ContainerT &data)
-		{	data.clear();	}
+		void prepare(ContainerT &container, size_t /*count*/) const
+		{	container.clear();	}
 
+		template <typename ContainerT>
+		void complete(ContainerT &/*container*/) const
+		{	}
+	};
+
+	struct sequence_container_reader : container_reader_base
+	{
 		template <typename ArchiveT, typename ContainerT>
-		void operator ()(ArchiveT &archive, ContainerT &data) const
+		void read_item(ArchiveT &archive, ContainerT &container) const
 		{
 			typename ContainerT::value_type value;
-			archive(value), data.push_back(value);
+			archive(value), container.push_back(value);
 		}
 
 		template <typename ArchiveT, typename ContainerT, typename ContextT>
-		void operator ()(ArchiveT &archive, ContainerT &data, ContextT &context) const
+		void read_item(ArchiveT &archive, ContainerT &container, ContextT &context) const
 		{
 			typename ContainerT::value_type value;
-			archive(value, context), data.push_back(value);
+			archive(value, context), container.push_back(value);
 		}
 	};
 
-	struct associative_container_reader
+	struct associative_container_reader : container_reader_base
 	{
-		template <typename ContainerT>
-		void prepare(ContainerT &data)
-		{	data.clear();	}
-
 		template <typename ArchiveT, typename ContainerT>
-		void operator ()(ArchiveT &archive, ContainerT &data) const
+		void read_item(ArchiveT &archive, ContainerT &container) const
 		{
 			typename remove_const<typename ContainerT::value_type>::type value;
-			archive(value), data.insert(value);
+			archive(value), container.insert(value);
 		}
 
 		template <typename ArchiveT, typename ContainerT, typename ContextT>
-		void operator ()(ArchiveT &archive, ContainerT &data, ContextT &context)
+		void read_item(ArchiveT &archive, ContainerT &container, ContextT &context) const
 		{
 			typename remove_const<typename ContainerT::value_type>::type value;
-			archive(value, context), data.insert(value);
+			archive(value, context), container.insert(value);
+		}
+	};
+
+	struct indexed_associative_container_reader : container_reader_base
+	{
+		template <typename ArchiveT, typename ContainerT>
+		void read_item(ArchiveT &archive, ContainerT &container) const
+		{
+			typename remove_const<typename ContainerT::key_type>::type key;
+			archive(key), archive(container[key]);
+		}
+
+		template <typename ArchiveT, typename ContainerT, typename ContextT>
+		void read_item(ArchiveT &archive, ContainerT &container, ContextT &context) const
+		{
+			typename remove_const<typename ContainerT::key_type>::type key;
+			archive(key, context), archive(container[key], context);
 		}
 	};
 
@@ -86,6 +106,12 @@ namespace strmd
 		typedef associative_container_reader item_reader_type;
 	};
 
+	struct indexed_associative_container_traits
+	{
+		typedef container_type_tag category;
+		typedef indexed_associative_container_reader item_reader_type;
+	};
+
 
 
 	template <typename T, typename TraitsT, typename A> struct type_traits< std::basic_string<T, TraitsT, A> > : sequence_container_traits { };
@@ -95,6 +121,6 @@ namespace strmd
 
 	template <typename T, typename CompT, typename A> struct type_traits< std::set<T, CompT, A> > : associative_container_traits { };
 	template <typename T, typename CompT, typename A> struct type_traits< std::multiset<T, CompT, A> > : associative_container_traits { };
-	template <typename KeyT, typename T, typename CompT, typename A> struct type_traits< std::map<KeyT, T, CompT, A> > : associative_container_traits { };
+	template <typename KeyT, typename T, typename CompT, typename A> struct type_traits< std::map<KeyT, T, CompT, A> > : indexed_associative_container_traits { };
 	template <typename KeyT, typename T, typename CompT, typename A> struct type_traits< std::multimap<KeyT, T, CompT, A> > : associative_container_traits { };
 }

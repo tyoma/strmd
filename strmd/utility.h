@@ -34,4 +34,11 @@ namespace strmd
 		archive(data.first);
 		archive(data.second);
 	}
+
+	template <typename ArchiveT, typename T1, typename T2, typename ContextT>
+	inline void serialize(ArchiveT &archive, std::pair<T1, T2> &data, unsigned /*version*/, ContextT &context)
+	{
+		archive(data.first, context);
+		archive(data.second, context);
+	}
 }
