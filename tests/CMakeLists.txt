@@ -10,6 +10,8 @@ set(STRMD_TEST_SOURCES
 	SerializerTests.cpp
 	TypeTraitsExTests.cpp
 	TypeTraitsTests.cpp
+	VersionedDeSerializationTests.cpp
+	VersionedSerializationTests.cpp
 )
 
 add_compile_options("$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-std=c++03>")

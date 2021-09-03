@@ -66,7 +66,7 @@ namespace strmd
 
 
 	template <typename T> struct is_signed { static const bool value = make_unsigned<T>::was_signed; };
-	template <typename T> struct is_versioned {	static const bool value = version<T>::value != unversioned;	};
+	template <typename T> struct is_versioned {	static const bool value = version<T>::value != static_cast<int>(unversioned);	};
 
 
 	template <typename T> struct remove_const { typedef T type; };
