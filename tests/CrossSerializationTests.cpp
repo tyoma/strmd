@@ -12,7 +12,7 @@ using namespace std;
 namespace strmd
 {
 	template <typename ArchiveT, typename T1, typename T2>
-	inline void serialize(ArchiveT &archive, pair<T1, T2> &data, unsigned /*version*/, string &context)
+	inline void serialize(ArchiveT &archive, pair<T1, T2> &data, string &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -20,7 +20,7 @@ namespace strmd
 	}
 
 	template <typename ArchiveT, typename T1>
-	inline void serialize(ArchiveT &archive, pair<T1, string> &data, unsigned /*version*/, long &context)
+	inline void serialize(ArchiveT &archive, pair<T1, string> &data, long &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -28,7 +28,7 @@ namespace strmd
 	}
 
 	template <typename ArchiveT, typename T1>
-	inline void serialize(ArchiveT &archive, pair<T1, int> &data, unsigned /*version*/, int &context)
+	inline void serialize(ArchiveT &archive, pair<T1, int> &data, int &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -36,7 +36,7 @@ namespace strmd
 	}
 
 	template <typename ArchiveT, typename ContextT>
-	inline void serialize(ArchiveT &archive, pair<string, int> &data, unsigned /*version*/, ContextT &context)
+	inline void serialize(ArchiveT &archive, pair<string, int> &data, ContextT &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -44,7 +44,7 @@ namespace strmd
 	}
 
 	template <typename ArchiveT>
-	inline void serialize(ArchiveT &archive, pair<int, int> &data, unsigned /*version*/, unsigned long long &context)
+	inline void serialize(ArchiveT &archive, pair<int, int> &data, unsigned long long &context)
 	{
 		archive(data.first);
 		archive(data.second);
@@ -52,16 +52,14 @@ namespace strmd
 	}
 
 	template <typename ArchiveT>
-	inline void serialize(ArchiveT &archive, tests::MyKey &data, unsigned /*version*/,
-		pair< vector<int>, vector<string> > &context)
+	inline void serialize(ArchiveT &archive, tests::MyKey &data, pair< vector<int>, vector<string> > &context)
 	{
 		archive(data.value);
 		context.first.push_back(data.value);
 	}
 
 	template <typename ArchiveT>
-	inline void serialize(ArchiveT &archive, tests::A &data, unsigned /*version*/,
-		pair< vector<int>, vector<string> > &context)
+	inline void serialize(ArchiveT &archive, tests::A &data, pair< vector<int>, vector<string> > &context)
 	{
 		archive(data.a);
 		archive(data.b);

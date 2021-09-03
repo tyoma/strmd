@@ -58,6 +58,12 @@ namespace strmd
 		template <typename T, typename ContextT>
 		void process(const T &data, ContextT &context, user_type_tag);
 
+		template <typename T>
+		void process(const T &data, versioned_user_type_tag);
+
+		template <typename T, typename ContextT>
+		void process(const T &data, ContextT &context, versioned_user_type_tag);
+
 	private:
 		StreamT &_stream;
 	};
@@ -71,12 +77,12 @@ namespace strmd
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void serializer<StreamT, PackerT>::operator ()(const T &data)
-	{	process(data, typename type_traits<T>::category());	}
+	{	process(data, typename type_traits<T, is_versioned<T>::value>::category());	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
 	inline void serializer<StreamT, PackerT>::operator ()(const T &data, ContextT &context)
-	{	process(data, context, typename type_traits<T>::category());	}
+	{	process(data, context, typename type_traits<T, is_versioned<T>::value>::category());	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
@@ -109,10 +115,45 @@ namespace strmd
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void serializer<StreamT, PackerT>::process(const T &data, user_type_tag)
-	{	serialize(*this, const_cast<T &>(data), 0u);	}
+	{	serialize(*this, const_cast<T &>(data));	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
 	inline void serializer<StreamT, PackerT>::process(const T &data, ContextT &context, user_type_tag)
-	{	serialize(*this, const_cast<T &>(data), 0u, context);	}
+	{	serialize(*this, const_cast<T &>(data), context);	}
+
+
+	struct counting_writer
+	{
+		void write(const void *, size_t size)
+		{	written += size;	}
+
+		size_t written;
+	};
+
+	template <typename StreamT, typename PackerT>
+	template <typename T>
+	inline void serializer<StreamT, PackerT>::process(const T &data, versioned_user_type_tag)
+	{
+		counting_writer counter = { };
+		serializer<counting_writer, PackerT> s(counter);
+
+		(*this)(static_cast<unsigned int>(version<T>::value));
+		serialize(s, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
+		(*this)(counter.written);
+		serialize(*this, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
+	}
+
+	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void serializer<StreamT, PackerT>::process(const T &data, ContextT &context, versioned_user_type_tag)
+	{
+		counting_writer counter = { };
+		serializer<counting_writer, PackerT> s(counter);
+
+		(*this)(static_cast<unsigned int>(version<T>::value));
+		serialize(s, const_cast<T &>(data), context, static_cast<unsigned int>(version<T>::value));
+		(*this)(counter.written);
+		serialize(*this, const_cast<T &>(data), context, static_cast<unsigned int>(version<T>::value));
+	}
 }

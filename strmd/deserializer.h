@@ -58,6 +58,12 @@ namespace strmd
 		template <typename T, typename ContextT>
 		void process(T &data, ContextT &context, user_type_tag);
 
+		template <typename T>
+		void process(T &data, versioned_user_type_tag);
+
+		template <typename T, typename ContextT>
+		void process(T &data, ContextT &context, versioned_user_type_tag);
+
 	private:
 		StreamT &_stream;
 	};
@@ -72,12 +78,12 @@ namespace strmd
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void deserializer<StreamT, PackerT>::operator ()(T &data)
-	{	process(data, typename type_traits<T>::category());	}
+	{	process(data, typename type_traits<T, is_versioned<T>::value>::category());	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
 	inline void deserializer<StreamT, PackerT>::operator ()(T &data, ContextT &context)
-	{	process(data, context, typename type_traits<T>::category());	}
+	{	process(data, context, typename type_traits<T, is_versioned<T>::value>::category());	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T>
@@ -120,10 +126,52 @@ namespace strmd
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void deserializer<StreamT, PackerT>::process(T &data, user_type_tag)
-	{	serialize(*this, data, 0u);	}
+	{	serialize(*this, data);	}
 
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename ContextT>
 	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &context, user_type_tag)
-	{	serialize(*this, data, 0u, context);	}
+	{	serialize(*this, data, context);	}
+
+
+	template <typename StreamT>
+	struct counting_reader
+	{
+		void read(void *data, size_t size)
+		{
+			underlying->read(data, size);
+			remaining -= size;
+		}
+
+		StreamT *underlying;
+		size_t remaining;
+	};
+
+	template <typename StreamT, typename PackerT>
+	template <typename T>
+	inline void deserializer<StreamT, PackerT>::process(T &data, versioned_user_type_tag)
+	{
+		unsigned int version_;
+		counting_reader<StreamT> r = {	&_stream, 0u };
+		deserializer<counting_reader<StreamT>, PackerT> d(r);
+
+		(*this)(version_);
+		(*this)(r.remaining);
+		serialize(d, data, version_);
+		_stream.skip(r.remaining);
+	}
+
+	template <typename StreamT, typename PackerT>
+	template <typename T, typename ContextT>
+	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &context, versioned_user_type_tag)
+	{
+		unsigned int version_;
+		counting_reader<StreamT> r = {	&_stream, 0u };
+		deserializer<counting_reader<StreamT>, PackerT> d(r);
+
+		(*this)(version_);
+		(*this)(r.remaining);
+		serialize(d, data, context, version_);
+		_stream.skip(r.remaining);
+	}
 }

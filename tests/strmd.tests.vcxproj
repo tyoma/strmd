@@ -49,6 +49,8 @@
     <ClCompile Include="CrossSerializationTests.cpp" />
     <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="PackerTests.cpp" />
+    <ClCompile Include="VersionedDeSerializationTests.cpp" />
+    <ClCompile Include="VersionedSerializationTests.cpp" />
     <ClCompile Include="SerializerTests.cpp" />
     <ClCompile Include="TypeTraitsExTests.cpp" />
     <ClCompile Include="TypeTraitsTests.cpp" />

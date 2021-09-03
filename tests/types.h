@@ -38,7 +38,7 @@ namespace strmd
 		};
 
 		template <typename ArchiveT>
-		inline void serialize(ArchiveT &archive, A &v, unsigned /*version*/)
+		inline void serialize(ArchiveT &archive, A &v)
 		{
 			archive(v.a);
 			archive(v.b);
@@ -46,21 +46,21 @@ namespace strmd
 		}
 
 		template <typename ArchiveT>
-		inline void serialize(ArchiveT &archive, B &v, unsigned /*version*/)
+		inline void serialize(ArchiveT &archive, B &v)
 		{
 			archive(v.a);
 			archive(v.b);
 		}
 
 		template <typename ArchiveT>
-		inline void serialize(ArchiveT &archive, C &v, unsigned /*version*/)
+		inline void serialize(ArchiveT &archive, C &v)
 		{
 			archive(v.b);
 			archive(v.a);
 		}
 
 		template <typename ArchiveT>
-		inline void serialize(ArchiveT &archive, MyKey &v, unsigned /*version*/)
+		inline void serialize(ArchiveT &archive, MyKey &v)
 		{	archive(v.value);	}
 	}
 }

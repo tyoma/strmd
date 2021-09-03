@@ -70,6 +70,9 @@ namespace strmd
 				_ptr += size;
 			}
 
+			void skip(size_t n)
+			{	_ptr += n;	}
+
 		private:
 			void operator =(const vector_reader &rhs);
 
