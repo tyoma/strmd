@@ -21,25 +21,69 @@ namespace
 		vector<unsigned> versions;
 		vector<int> contexts;
 	};
+
+	struct V13
+	{
+		string a;
+		int b;
+	};
+
+	struct V15
+	{
+		int a;
+		vector<int> b;
+	};
 }
 
 namespace strmd
 {
 	template <> struct version<A1> {	enum {	value = 7777777	};	};
+	template <> struct version<V13> {	enum {	value = 7777777	};	};
+	template <> struct version<V15> {	enum {	value = 7777777	};	};
 
 	template <typename ArchiveT>
-	void serialize(ArchiveT &a, A1&v, unsigned ver)
+	void serialize(ArchiveT &a, A1 &v, unsigned ver)
 	{
 		a(v.a), a(v.b), a(v.c);
 		v.versions.push_back(ver);
 	}
 
 	template <typename ArchiveT>
-	void serialize(ArchiveT &a, A1&v, context_t &ctx, unsigned ver)
+	void serialize(ArchiveT &a, A1 &v, context_t &ctx, unsigned ver)
 	{
 		a(v.a), a(v.b), a(v.c);
 		v.versions.push_back(ver);
 		v.contexts.push_back(ctx.v);
+	}
+
+	template <typename ArchiveT>
+	void serialize(ArchiveT &a, V13 &v, unsigned ver)
+	{
+		a(v.a), a(v.b);
+		assert_equal(13u, ver);
+	}
+
+	template <typename ArchiveT>
+	void serialize(ArchiveT &a, V15 &v, unsigned ver)
+	{
+		a(v.a), a(v.b);
+		assert_equal(15u, ver);
+	}
+
+	template <typename ArchiveT>
+	void serialize(ArchiveT &a, V13 &v, const string &ctx, unsigned ver)
+	{
+		a(v.a), a(v.b);
+		assert_equal("BAR", ctx);
+		assert_equal(13u, ver);
+	}
+
+	template <typename ArchiveT>
+	void serialize(ArchiveT &a, V15 &v, int ctx, unsigned ver)
+	{
+		a(v.a), a(v.b);
+		assert_equal(181, ctx);
+		assert_equal(15u, ver);
 	}
 
 	namespace tests
@@ -234,6 +278,85 @@ namespace strmd
 				assert_equal(1u, a.a);
 				assert_equal(11u, a.b);
 				assert_equal(23u, a.c);
+			}
+
+
+			test( StaticVersionDeserializationDoesNotAttemptToReadVersionAndSize )
+			{
+				// INIT
+				vector_reader r(buffer);
+				deserializer<vector_reader, varint, 13> dser1(r);
+				V13 v13 = {};
+				V15 v15 = {};
+				varint::pack(w, 3u);
+				varint::pack(w, 'f');
+				varint::pack(w, 'o');
+				varint::pack(w, 'o');
+				varint::pack(w, 1191183);
+
+				varint::pack(w, 19191723);
+				varint::pack(w, 2u);
+				varint::pack(w, 173);
+				varint::pack(w, 171);
+
+				// ACT
+				dser1(v13);
+
+				// ASSERT
+				assert_equal("foo", v13.a);
+				assert_equal(1191183, v13.b);
+
+				// INIT
+				deserializer<vector_reader, varint, 15> dser2(r);
+
+				// ACT
+				dser2(v15);
+
+				// ASSERT
+				unsigned reference[] = {	173u, 171u,	};
+
+				assert_equal(19191723, v15.a);
+				assert_equal(reference, v15.b);
+			}
+
+
+			test( StaticVersionDeserializationDoesNotAttemptToReadVersionAndSizeWithContext )
+			{
+				// INIT
+				vector_reader r(buffer);
+				deserializer<vector_reader, varint, 13> dser1(r);
+				V13 v13 = {};
+				V15 v15 = {};
+				varint::pack(w, 3u);
+				varint::pack(w, 'f');
+				varint::pack(w, 'o');
+				varint::pack(w, 'o');
+				varint::pack(w, 1191183);
+
+				varint::pack(w, 19191723);
+				varint::pack(w, 2u);
+				varint::pack(w, 173);
+				varint::pack(w, 171);
+
+				// ACT
+				dser1(v13, "BAR");
+
+				// ASSERT
+				assert_equal("foo", v13.a);
+				assert_equal(1191183, v13.b);
+
+				// INIT
+				deserializer<vector_reader, varint, 15> dser2(r);
+				int ctx = 181;
+
+				// ACT
+				dser2(v15, ctx);
+
+				// ASSERT
+				unsigned reference[] = {	173u, 171u,	};
+
+				assert_equal(19191723, v15.a);
+				assert_equal(reference, v15.b);
 			}
 		end_test_suite
 	}

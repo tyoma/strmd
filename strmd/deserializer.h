@@ -23,9 +23,11 @@
 #include "container.h"
 #include "packer.h"
 
+#pragma warning(disable: 4127)
+
 namespace strmd
 {
-	template <typename StreamT, typename PackerT = direct>
+	template <typename StreamT, typename PackerT = direct, int static_version = unversioned>
 	class deserializer
 	{
 	public:
@@ -70,34 +72,34 @@ namespace strmd
 
 
 
-	template <typename StreamT, typename PackerT>
-	inline deserializer<StreamT, PackerT>::deserializer(StreamT &stream)
+	template <typename StreamT, typename PackerT, int static_version>
+	inline deserializer<StreamT, PackerT, static_version>::deserializer(StreamT &stream)
 		: _stream(stream)
 	{	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::operator ()(T &data)
+	inline void deserializer<StreamT, PackerT, static_version>::operator ()(T &data)
 	{	process(data, typename type_traits<T, is_versioned<T>::value>::category());	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::operator ()(T &data, ContextT &context)
+	inline void deserializer<StreamT, PackerT, static_version>::operator ()(T &data, ContextT &context)
 	{	process(data, context, typename type_traits<T, is_versioned<T>::value>::category());	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process(T &data, arithmetic_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, arithmetic_type_tag)
 	{	PackerT::unpack(_stream, data);	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &/*context*/, arithmetic_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &/*context*/, arithmetic_type_tag)
 	{	PackerT::unpack(_stream, data);	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process(T &container, container_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &container, container_type_tag)
 	{
 		unsigned int count;
 		typename type_traits<T>::item_reader_type reader;
@@ -109,9 +111,9 @@ namespace strmd
 		reader.complete(container);
 	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::process(T &container, ContextT &context, container_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &container, ContextT &context, container_type_tag)
 	{
 		unsigned int count;
 		typename type_traits<T>::item_reader_type reader;
@@ -123,14 +125,14 @@ namespace strmd
 		reader.complete(container);
 	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process(T &data, user_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, user_type_tag)
 	{	serialize(*this, data);	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &context, user_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &context, user_type_tag)
 	{	serialize(*this, data, context);	}
 
 
@@ -147,31 +149,45 @@ namespace strmd
 		size_t remaining;
 	};
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T>
-	inline void deserializer<StreamT, PackerT>::process(T &data, versioned_user_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, versioned_user_type_tag)
 	{
-		unsigned int version_;
-		counting_reader<StreamT> r = {	&_stream, 0u };
-		deserializer<counting_reader<StreamT>, PackerT> d(r);
+		if (static_version == unversioned)
+		{
+			unsigned int version_;
+			counting_reader<StreamT> r = {	&_stream, 0u };
+			deserializer<counting_reader<StreamT>, PackerT> d(r);
 
-		(*this)(version_);
-		(*this)(r.remaining);
-		serialize(d, data, version_);
-		_stream.skip(r.remaining);
+			(*this)(version_);
+			(*this)(r.remaining);
+			serialize(d, data, version_);
+			_stream.skip(r.remaining);
+		}
+		else
+		{
+			serialize(*this, data, static_cast<unsigned int>(static_version));
+		}
 	}
 
-	template <typename StreamT, typename PackerT>
+	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT>::process(T &data, ContextT &context, versioned_user_type_tag)
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &context, versioned_user_type_tag)
 	{
-		unsigned int version_;
-		counting_reader<StreamT> r = {	&_stream, 0u };
-		deserializer<counting_reader<StreamT>, PackerT> d(r);
+		if (static_version == unversioned)
+		{
+			unsigned int version_;
+			counting_reader<StreamT> r = {	&_stream, 0u };
+			deserializer<counting_reader<StreamT>, PackerT> d(r);
 
-		(*this)(version_);
-		(*this)(r.remaining);
-		serialize(d, data, context, version_);
-		_stream.skip(r.remaining);
+			(*this)(version_);
+			(*this)(r.remaining);
+			serialize(d, data, context, version_);
+			_stream.skip(r.remaining);
+		}
+		else
+		{
+			serialize(*this, data, static_cast<unsigned int>(static_version));
+		}
 	}
 }
