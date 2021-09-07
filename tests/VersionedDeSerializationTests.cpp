@@ -313,7 +313,7 @@ namespace strmd
 				dser2(v15);
 
 				// ASSERT
-				unsigned reference[] = {	173u, 171u,	};
+				int reference[] = {	173u, 171u,	};
 
 				assert_equal(19191723, v15.a);
 				assert_equal(reference, v15.b);
@@ -353,7 +353,7 @@ namespace strmd
 				dser2(v15, ctx);
 
 				// ASSERT
-				unsigned reference[] = {	173u, 171u,	};
+				int reference[] = {	173u, 171u,	};
 
 				assert_equal(19191723, v15.a);
 				assert_equal(reference, v15.b);
