@@ -38,20 +38,28 @@ namespace strmd
 		public:
 			template <size_t N>
 			buffer_reader(unsigned char (&p)[N])
-				: _ptr(p), _remaining(N)
+				: ptr(p), remaining(N), skipped(0)
 			{	}
 
 			void read(void *data, size_t size)
 			{
-				assert_is_true(size <= _remaining);
-				std::memcpy(data, _ptr, size);
-				_ptr += size;
-				_remaining -= size;
+				assert_is_true(size <= remaining);
+				std::memcpy(data, ptr, size);
+				ptr += size;
+				remaining -= size;
 			}
 
-		private:
-			const unsigned char *_ptr;
-			size_t _remaining;
+			void skip(size_t size)
+			{
+				assert_is_true(size <= remaining);
+				ptr += size;
+				remaining -= size;
+				skipped += size;
+			}
+
+		public:
+			const unsigned char *ptr;
+			size_t remaining, skipped;
 		};
 
 

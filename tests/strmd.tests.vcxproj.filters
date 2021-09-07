@@ -10,6 +10,7 @@
     <ClCompile Include="ContainerDeserializationTests.cpp" />
     <ClCompile Include="VersionedDeSerializationTests.cpp" />
     <ClCompile Include="VersionedSerializationTests.cpp" />
+    <ClCompile Include="HelpersTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library Headers">
@@ -38,6 +39,9 @@
       <Filter>Library Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\strmd\utility.h">
+      <Filter>Library Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\strmd\stream_counter.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
   </ItemGroup>

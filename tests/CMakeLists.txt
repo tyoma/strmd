@@ -6,6 +6,7 @@ set(STRMD_TEST_SOURCES
 	ContainerDeserializationTests.cpp
 	CrossSerializationTests.cpp
 	DeserializerTests.cpp
+	HelpersTests.cpp
 	PackerTests.cpp
 	SerializerTests.cpp
 	TypeTraitsExTests.cpp

@@ -41,6 +41,7 @@
     <ClCompile Include="CrossSerializationTests.cpp" />
     <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="PackerTests.cpp" />
+    <ClCompile Include="HelpersTests.cpp" />
     <ClCompile Include="VersionedDeSerializationTests.cpp" />
     <ClCompile Include="VersionedSerializationTests.cpp" />
     <ClCompile Include="SerializerTests.cpp" />
@@ -51,6 +52,7 @@
     <ClInclude Include="..\strmd\container.h" />
     <ClInclude Include="..\strmd\container_ex.h" />
     <ClInclude Include="..\strmd\deserializer.h" />
+    <ClInclude Include="..\strmd\stream_counter.h" />
     <ClInclude Include="..\strmd\packer.h" />
     <ClInclude Include="..\strmd\serializer.h" />
     <ClInclude Include="..\strmd\type_traits.h" />

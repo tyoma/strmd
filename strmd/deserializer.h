@@ -22,6 +22,7 @@
 
 #include "container.h"
 #include "packer.h"
+#include "stream_counter.h"
 
 #pragma warning(disable: 4127)
 
@@ -135,20 +136,6 @@ namespace strmd
 	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &context, user_type_tag)
 	{	serialize(*this, data, context);	}
 
-
-	template <typename StreamT>
-	struct counting_reader
-	{
-		void read(void *data, size_t size)
-		{
-			underlying->read(data, size);
-			remaining -= size;
-		}
-
-		StreamT *underlying;
-		size_t remaining;
-	};
-
 	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T>
 	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, versioned_user_type_tag)
@@ -156,18 +143,16 @@ namespace strmd
 		if (static_version == unversioned)
 		{
 			unsigned int version_;
-			counting_reader<StreamT> r = {	&_stream, 0u };
-			deserializer<counting_reader<StreamT>, PackerT> d(r);
+			reads_counter<StreamT> r = {	&_stream, 0u };
+			deserializer<reads_counter<StreamT>, PackerT> d(r);
 
 			(*this)(version_);
 			(*this)(r.remaining);
 			serialize(d, data, version_);
 			_stream.skip(r.remaining);
+			return;
 		}
-		else
-		{
-			serialize(*this, data, static_cast<unsigned int>(static_version));
-		}
+		serialize(*this, data, static_cast<unsigned int>(static_version));
 	}
 
 	template <typename StreamT, typename PackerT, int static_version>
@@ -177,17 +162,15 @@ namespace strmd
 		if (static_version == unversioned)
 		{
 			unsigned int version_;
-			counting_reader<StreamT> r = {	&_stream, 0u };
-			deserializer<counting_reader<StreamT>, PackerT> d(r);
+			reads_counter<StreamT> r = {	&_stream, 0u };
+			deserializer<reads_counter<StreamT>, PackerT> d(r);
 
 			(*this)(version_);
 			(*this)(r.remaining);
 			serialize(d, data, context, version_);
 			_stream.skip(r.remaining);
+			return;
 		}
-		else
-		{
-			serialize(*this, data, static_cast<unsigned int>(static_version));
-		}
+		serialize(*this, data, static_cast<unsigned int>(static_version));
 	}
 }

@@ -22,6 +22,7 @@
 
 #include "container.h"
 #include "packer.h"
+#include "stream_counter.h"
 
 namespace strmd
 {
@@ -123,20 +124,12 @@ namespace strmd
 	{	serialize(*this, const_cast<T &>(data), context);	}
 
 
-	struct counting_writer
-	{
-		void write(const void *, size_t size)
-		{	written += size;	}
-
-		size_t written;
-	};
-
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void serializer<StreamT, PackerT>::process(const T &data, versioned_user_type_tag)
 	{
-		counting_writer counter = { };
-		serializer<counting_writer, PackerT> s(counter);
+		writes_counter counter = { };
+		serializer<writes_counter, PackerT> s(counter);
 
 		(*this)(static_cast<unsigned int>(version<T>::value));
 		serialize(s, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
@@ -148,8 +141,8 @@ namespace strmd
 	template <typename T, typename ContextT>
 	inline void serializer<StreamT, PackerT>::process(const T &data, ContextT &context, versioned_user_type_tag)
 	{
-		counting_writer counter = { };
-		serializer<counting_writer, PackerT> s(counter);
+		writes_counter counter = { };
+		serializer<writes_counter, PackerT> s(counter);
 
 		(*this)(static_cast<unsigned int>(version<T>::value));
 		serialize(s, const_cast<T &>(data), context, static_cast<unsigned int>(version<T>::value));
