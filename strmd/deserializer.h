@@ -24,7 +24,9 @@
 #include "packer.h"
 #include "stream_counter.h"
 
-#pragma warning(disable: 4127)
+#ifdef _MSC_VER
+	#pragma warning(disable: 4127)
+#endif
 
 namespace strmd
 {

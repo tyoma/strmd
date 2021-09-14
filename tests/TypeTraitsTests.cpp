@@ -30,6 +30,10 @@ namespace strmd
 			template <typename T>
 			struct custom_allocator : allocator<T>
 			{	};
+			
+			template <typename T>
+			void unused(T /*v*/)
+			{	}
 		}
 
 		begin_test_suite( TypeTraitsTests )
@@ -131,6 +135,16 @@ namespace strmd
 				v7 = make_pair(1225, 'i');
 				v8 = make_pair(115, "kree");
 				v9 = make_pair("asdasd", 314159);
+				
+				unused(v1);
+				unused(v2);
+				unused(v3);
+				unused(v4);
+				unused(v5);
+				unused(v6);
+				unused(v7);
+				unused(v8);
+				unused(v9);
 			}
 
 		end_test_suite

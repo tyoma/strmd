@@ -281,7 +281,7 @@ namespace strmd
 
 				// ASSERT
 				assert_equal(reference2, read2);
-				assert_equal(123 + 1 + 11 + 21 + 1211 + 11121111 + 1, ullcontext);
+				assert_equal(123u + 1u + 11u + 21u + 1211u + 11121111u + 1u, ullcontext);
 
 				// INIT
 				s(reference1);

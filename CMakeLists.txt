@@ -11,8 +11,14 @@ endif()
 
 include_directories(.)
 
-add_compile_options("$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-fPIC>")
-add_compile_options("$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-fshort-wchar>")
+set(GCC_CLANG_COMPILER_OPTIONS -fPIC -fshort-wchar -Wpedantic -Wall -Wno-long-long)
+
+add_compile_options(
+	"$<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:C>:${GCC_CLANG_COMPILER_OPTIONS}>>"
+	"$<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:${GCC_CLANG_COMPILER_OPTIONS}>>"
+	"$<$<CXX_COMPILER_ID:MSVC>:/W4>"
+)
+
 add_definitions(-D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS)
 
 add_subdirectory(tests)
