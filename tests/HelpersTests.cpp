@@ -53,7 +53,9 @@ namespace strmd
 				buffer_reader u(reference);
 
 				// INIT / ACT
-				reads_counter<buffer_reader> r = {	&u, 1023	};
+				reads_counter<buffer_reader> r(&u);
+
+				r.remaining = 1023;
 
 				// ACT
 				r.read(data, 43);
@@ -76,7 +78,9 @@ namespace strmd
 				buffer_reader u(reference);
 
 				// INIT / ACT
-				reads_counter<buffer_reader> r = {	&u, 1023	};
+				reads_counter<buffer_reader> r(&u);
+
+				r.remaining = 1023;
 
 				// ACT
 				r.skip(43);
@@ -100,7 +104,9 @@ namespace strmd
 				buffer_reader u(reference);
 
 				// INIT / ACT
-				reads_counter<buffer_reader> r = {	&u, 1023	};
+				reads_counter<buffer_reader> r(&u);
+				
+				r.remaining = 1023;
 
 				// ACT
 				r.read(data, 43);
@@ -123,7 +129,9 @@ namespace strmd
 				buffer_reader u(reference);
 
 				// INIT / ACT
-				reads_counter<buffer_reader> r = {	&u, 1023	};
+				reads_counter<buffer_reader> r(&u);
+
+				r.remaining = 1023;
 
 				// ACT
 				r.skip(170u);

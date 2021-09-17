@@ -11,6 +11,7 @@
     <ClCompile Include="VersionedDeSerializationTests.cpp" />
     <ClCompile Include="VersionedSerializationTests.cpp" />
     <ClCompile Include="HelpersTests.cpp" />
+    <ClCompile Include="RecursiveTypesSupport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library Headers">

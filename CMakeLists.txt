@@ -11,7 +11,7 @@ endif()
 
 include_directories(.)
 
-set(GCC_CLANG_COMPILER_OPTIONS -fPIC -fshort-wchar -Wpedantic -Wall -Wno-long-long)
+set(GCC_CLANG_COMPILER_OPTIONS -fPIC -fshort-wchar -Wpedantic -Wall -Wextra -Wno-long-long)
 
 add_compile_options(
 	"$<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:C>:${GCC_CLANG_COMPILER_OPTIONS}>>"

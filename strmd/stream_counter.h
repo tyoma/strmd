@@ -35,12 +35,19 @@ namespace strmd
 	template <typename U>
 	struct reads_counter
 	{
+		reads_counter(U *underlying);
+		reads_counter(reads_counter *underlying);
+
 		void read(void *data, std::size_t size);
 		void skip(std::size_t size);
 
-		U *underlying;
+		U *underlying_other;
+		reads_counter *underlying_same;
 		size_t remaining;
 	};
+
+	template <typename U> struct nested_reads_counter {	typedef reads_counter<U> type;	};
+	template <typename U> struct nested_reads_counter< reads_counter<U> > {	typedef reads_counter<U> type;	};
 
 
 
@@ -49,16 +56,26 @@ namespace strmd
 
 
 	template <typename U>
+	inline reads_counter<U>::reads_counter(U *underlying)
+		: underlying_other(underlying), underlying_same(0)
+	{	}
+
+	template <typename U>
+	inline reads_counter<U>::reads_counter(reads_counter *underlying)
+		: underlying_other(0), underlying_same(underlying)
+	{	}
+
+	template <typename U>
 	inline void reads_counter<U>::read(void *data, std::size_t size)
 	{
-		underlying->read(data, size);
+		underlying_other ? underlying_other->read(data, size) : underlying_same->read(data, size);
 		remaining -= size;
 	}
 
 	template <typename U>
 	inline void reads_counter<U>::skip(std::size_t size)
 	{
-		underlying->skip(size);
+		underlying_other ? underlying_other->skip(size) : underlying_same->skip(size);
 		remaining -= size;
 	}
 }

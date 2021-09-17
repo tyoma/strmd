@@ -42,6 +42,7 @@
     <ClCompile Include="DeserializerTests.cpp" />
     <ClCompile Include="PackerTests.cpp" />
     <ClCompile Include="HelpersTests.cpp" />
+    <ClCompile Include="RecursiveTypesSupport.cpp" />
     <ClCompile Include="VersionedDeSerializationTests.cpp" />
     <ClCompile Include="VersionedSerializationTests.cpp" />
     <ClCompile Include="SerializerTests.cpp" />

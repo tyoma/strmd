@@ -142,11 +142,13 @@ namespace strmd
 	template <typename T>
 	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, versioned_user_type_tag)
 	{
+		typedef typename nested_reads_counter< StreamT >::type reads_counter_t;
+
 		if (static_version == unversioned)
 		{
 			unsigned int version_;
-			reads_counter<StreamT> r = {	&_stream, 0u };
-			deserializer<reads_counter<StreamT>, PackerT> d(r);
+			reads_counter_t r(&_stream);
+			deserializer<reads_counter_t, PackerT> d(r);
 
 			(*this)(version_);
 			(*this)(r.remaining);
@@ -161,11 +163,13 @@ namespace strmd
 	template <typename T, typename ContextT>
 	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &context, versioned_user_type_tag)
 	{
+		typedef typename nested_reads_counter< StreamT >::type reads_counter_t;
+
 		if (static_version == unversioned)
 		{
 			unsigned int version_;
-			reads_counter<StreamT> r = {	&_stream, 0u };
-			deserializer<reads_counter<StreamT>, PackerT> d(r);
+			reads_counter_t r(&_stream);
+			deserializer<reads_counter_t, PackerT> d(r);
 
 			(*this)(version_);
 			(*this)(r.remaining);
