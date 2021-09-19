@@ -21,6 +21,7 @@
 #pragma once
 
 #include "container.h"
+#include "context.h"
 #include "packer.h"
 #include "stream_counter.h"
 
@@ -41,29 +42,17 @@ namespace strmd
 	private:
 		void operator =(const serializer &other);
 
-		template <typename T>
-		void process(T data, arithmetic_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(T data, const CtxBinderT &context, arithmetic_type_tag);
 
-		template <typename T, typename ContextT>
-		void process(T data, ContextT &context, arithmetic_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(const T &container, const CtxBinderT &context, container_type_tag);
 
-		template <typename T>
-		void process(const T &container, container_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(const T &data, const CtxBinderT &context, user_type_tag);
 
-		template <typename T, typename ContextT>
-		void process(const T &container, ContextT &context, container_type_tag);
-
-		template <typename T>
-		void process(const T &data, user_type_tag);
-
-		template <typename T, typename ContextT>
-		void process(const T &data, ContextT &context, user_type_tag);
-
-		template <typename T>
-		void process(const T &data, versioned_user_type_tag);
-
-		template <typename T, typename ContextT>
-		void process(const T &data, ContextT &context, versioned_user_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(const T &data, const CtxBinderT &context, versioned_user_type_tag);
 
 	private:
 		StreamT &_stream;
@@ -78,75 +67,45 @@ namespace strmd
 	template <typename StreamT, typename PackerT>
 	template <typename T>
 	inline void serializer<StreamT, PackerT>::operator ()(const T &data)
-	{	process(data, typename type_traits<T, is_versioned<T>::value>::category());	}
+	{	process(data, context_binder<void>(), typename type_traits<T, is_versioned<T>::value>::category());	}
 
 	template <typename StreamT, typename PackerT>
-	template <typename T, typename ContextT>
-	inline void serializer<StreamT, PackerT>::operator ()(const T &data, ContextT &context)
-	{	process(data, context, typename type_traits<T, is_versioned<T>::value>::category());	}
-
-	template <typename StreamT, typename PackerT>
-	template <typename T>
-	inline void serializer<StreamT, PackerT>::process(T data, arithmetic_type_tag)
-	{	PackerT::pack(_stream, data);	}
-
-	template <typename StreamT, typename PackerT>
-	template <typename T, typename ContextT>
-	inline void serializer<StreamT, PackerT>::process(T data, ContextT &/*context*/, arithmetic_type_tag)
-	{	PackerT::pack(_stream, data);	}
-
-	template <typename StreamT, typename PackerT>
-	template <typename T>
-	inline void serializer<StreamT, PackerT>::process(const T &container, container_type_tag)
+	template <typename T, typename Context>
+	inline void serializer<StreamT, PackerT>::operator ()(const T &data, Context &context)
 	{
-		(*this)(static_cast<unsigned int>(container.size()));
-		for (typename T::const_iterator i = container.begin(); i != container.end(); ++i)
-			(*this)(*i);
+		context_binder<Context &> ctx_binder(context);
+		process(data, ctx_binder, typename type_traits<T, is_versioned<T>::value>::category());
 	}
 
 	template <typename StreamT, typename PackerT>
-	template <typename T, typename ContextT>
-	inline void serializer<StreamT, PackerT>::process(const T &container, ContextT &context, container_type_tag)
+	template <typename T, typename CtxBinderT>
+	inline void serializer<StreamT, PackerT>::process(T data, const CtxBinderT &/*context*/, arithmetic_type_tag)
+	{	PackerT::pack(_stream, data);	}
+
+	template <typename StreamT, typename PackerT>
+	template <typename T, typename CtxBinderT>
+	inline void serializer<StreamT, PackerT>::process(const T &container, const CtxBinderT &context, container_type_tag)
 	{
 		(*this)(static_cast<unsigned int>(container.size()));
 		for (typename T::const_iterator i = container.begin(); i != container.end(); ++i)
-			(*this)(*i, context);
+			context.serialize_full(*this, *i);
 	}
 
 	template <typename StreamT, typename PackerT>
-	template <typename T>
-	inline void serializer<StreamT, PackerT>::process(const T &data, user_type_tag)
-	{	serialize(*this, const_cast<T &>(data));	}
+	template <typename T, typename CtxBinderT>
+	inline void serializer<StreamT, PackerT>::process(const T &data, const CtxBinderT &context, user_type_tag)
+	{	context.serialize_raw(*this, const_cast<T &>(data));	}
 
 	template <typename StreamT, typename PackerT>
-	template <typename T, typename ContextT>
-	inline void serializer<StreamT, PackerT>::process(const T &data, ContextT &context, user_type_tag)
-	{	serialize(*this, const_cast<T &>(data), context);	}
-
-
-	template <typename StreamT, typename PackerT>
-	template <typename T>
-	inline void serializer<StreamT, PackerT>::process(const T &data, versioned_user_type_tag)
+	template <typename T, typename CtxBinderT>
+	inline void serializer<StreamT, PackerT>::process(const T &data, const CtxBinderT &context, versioned_user_type_tag)
 	{
 		writes_counter counter = { };
 		serializer<writes_counter, PackerT> s(counter);
 
 		(*this)(static_cast<unsigned int>(version<T>::value));
-		serialize(s, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
+		context.serialize_raw(s, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
 		(*this)(counter.written);
-		serialize(*this, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
-	}
-
-	template <typename StreamT, typename PackerT>
-	template <typename T, typename ContextT>
-	inline void serializer<StreamT, PackerT>::process(const T &data, ContextT &context, versioned_user_type_tag)
-	{
-		writes_counter counter = { };
-		serializer<writes_counter, PackerT> s(counter);
-
-		(*this)(static_cast<unsigned int>(version<T>::value));
-		serialize(s, const_cast<T &>(data), context, static_cast<unsigned int>(version<T>::value));
-		(*this)(counter.written);
-		serialize(*this, const_cast<T &>(data), context, static_cast<unsigned int>(version<T>::value));
+		context.serialize_raw(*this, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
 	}
 }

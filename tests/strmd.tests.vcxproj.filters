@@ -45,5 +45,8 @@
     <ClInclude Include="..\strmd\stream_counter.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\strmd\context.h">
+      <Filter>Library Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

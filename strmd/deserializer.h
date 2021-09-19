@@ -21,6 +21,7 @@
 #pragma once
 
 #include "container.h"
+#include "context.h"
 #include "packer.h"
 #include "stream_counter.h"
 
@@ -45,29 +46,17 @@ namespace strmd
 	private:
 		void operator =(const deserializer &other);
 
-		template <typename T>
-		void process(T &data, arithmetic_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(T &data, const CtxBinderT &context, arithmetic_type_tag);
 
-		template <typename T, typename ContextT>
-		void process(T &data, ContextT &context, arithmetic_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(T &container, const CtxBinderT &context, container_type_tag);
 
-		template <typename T>
-		void process(T &container, container_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(T &data, const CtxBinderT &context, user_type_tag);
 
-		template <typename T, typename ContextT>
-		void process(T &container, ContextT &context, container_type_tag);
-
-		template <typename T>
-		void process(T &data, user_type_tag);
-
-		template <typename T, typename ContextT>
-		void process(T &data, ContextT &context, user_type_tag);
-
-		template <typename T>
-		void process(T &data, versioned_user_type_tag);
-
-		template <typename T, typename ContextT>
-		void process(T &data, ContextT &context, versioned_user_type_tag);
+		template <typename T, typename CtxBinderT>
+		void process(T &data, const CtxBinderT &context, versioned_user_type_tag);
 
 	private:
 		StreamT &_stream;
@@ -83,64 +72,44 @@ namespace strmd
 	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T>
 	inline void deserializer<StreamT, PackerT, static_version>::operator ()(T &data)
-	{	process(data, typename type_traits<T, is_versioned<T>::value>::category());	}
+	{	process(data, context_binder<void>(), typename type_traits<T, is_versioned<T>::value>::category());	}
 
 	template <typename StreamT, typename PackerT, int static_version>
 	template <typename T, typename ContextT>
 	inline void deserializer<StreamT, PackerT, static_version>::operator ()(T &data, ContextT &context)
-	{	process(data, context, typename type_traits<T, is_versioned<T>::value>::category());	}
+	{
+		context_binder<ContextT &> ctx_binder(context);
+		process(data, ctx_binder, typename type_traits<T, is_versioned<T>::value>::category());
+	}
 
 	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, arithmetic_type_tag)
+	template <typename T, typename CtxBinderT>
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, const CtxBinderT &/*context*/, arithmetic_type_tag)
 	{	PackerT::unpack(_stream, data);	}
 
 	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &/*context*/, arithmetic_type_tag)
-	{	PackerT::unpack(_stream, data);	}
-
-	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &container, container_type_tag)
+	template <typename T, typename CtxBinderT>
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &container, const CtxBinderT &context, container_type_tag)
 	{
 		unsigned int count;
 		typename type_traits<T>::item_reader_type reader;
 
 		(*this)(count);
-		reader.prepare(container, count);
+		context.prepare(reader, container, count);
 		while (count--)
-			reader.read_item(*this, container);
-		reader.complete(container);
+			context.read_item(reader, *this, container);
+		context.complete(reader, container);
 	}
 
 	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &container, ContextT &context, container_type_tag)
-	{
-		unsigned int count;
-		typename type_traits<T>::item_reader_type reader;
-
-		(*this)(count);
-		reader.prepare(container, count);
-		while (count--)
-			reader.read_item(*this, container, context);
-		reader.complete(container);
-	}
+	template <typename T, typename CtxBinderT>
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, const CtxBinderT &context, user_type_tag)
+	{	context.serialize_raw(*this, data);	}
 
 	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, user_type_tag)
-	{	serialize(*this, data);	}
-
-	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &context, user_type_tag)
-	{	serialize(*this, data, context);	}
-
-	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, versioned_user_type_tag)
+	template <typename T, typename CtxBinderT>
+	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, const CtxBinderT &context,
+		versioned_user_type_tag)
 	{
 		typedef typename nested_reads_counter< StreamT >::type reads_counter_t;
 
@@ -152,31 +121,10 @@ namespace strmd
 
 			(*this)(version_);
 			(*this)(r.remaining);
-			serialize(d, data, version_);
+			context.serialize_raw(d, data, version_);
 			_stream.skip(r.remaining);
 			return;
 		}
-		serialize(*this, data, static_cast<unsigned int>(static_version));
-	}
-
-	template <typename StreamT, typename PackerT, int static_version>
-	template <typename T, typename ContextT>
-	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, ContextT &context, versioned_user_type_tag)
-	{
-		typedef typename nested_reads_counter< StreamT >::type reads_counter_t;
-
-		if (static_version == unversioned)
-		{
-			unsigned int version_;
-			reads_counter_t r(&_stream);
-			deserializer<reads_counter_t, PackerT> d(r);
-
-			(*this)(version_);
-			(*this)(r.remaining);
-			serialize(d, data, context, version_);
-			_stream.skip(r.remaining);
-			return;
-		}
-		serialize(*this, data, static_cast<unsigned int>(static_version));
+		context.serialize_raw(*this, data, static_cast<unsigned int>(static_version));
 	}
 }
