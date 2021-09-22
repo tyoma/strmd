@@ -22,15 +22,10 @@
 
 namespace strmd
 {
-	enum {	unversioned = -1	};
-
 	struct arithmetic_type_tag {};
 	struct container_type_tag {};
 	struct user_type_tag {};
 	struct versioned_user_type_tag {};
-
-
-	template <typename T> struct version {	enum {	value = unversioned	};	};
 
 
 	template <typename T, bool versioned = false> struct type_traits { typedef user_type_tag /*default*/ category; };
@@ -66,7 +61,6 @@ namespace strmd
 
 
 	template <typename T> struct is_signed { static const bool value = make_unsigned<T>::was_signed; };
-	template <typename T> struct is_versioned {	static const bool value = version<T>::value != static_cast<int>(unversioned);	};
 
 
 	template <typename T> struct remove_const { typedef T type; };

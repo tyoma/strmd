@@ -54,11 +54,12 @@
     <ClInclude Include="..\strmd\container_ex.h" />
     <ClInclude Include="..\strmd\context.h" />
     <ClInclude Include="..\strmd\deserializer.h" />
-    <ClInclude Include="..\strmd\stream_counter.h" />
+    <ClInclude Include="..\strmd\stream_special.h" />
     <ClInclude Include="..\strmd\packer.h" />
     <ClInclude Include="..\strmd\serializer.h" />
     <ClInclude Include="..\strmd\type_traits.h" />
     <ClInclude Include="..\strmd\utility.h" />
+    <ClInclude Include="..\strmd\version.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>

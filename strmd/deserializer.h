@@ -23,7 +23,8 @@
 #include "container.h"
 #include "context.h"
 #include "packer.h"
-#include "stream_counter.h"
+#include "stream_special.h"
+#include "version.h"
 
 #ifdef _MSC_VER
 	#pragma warning(disable: 4127)
@@ -44,7 +45,8 @@ namespace strmd
 		void operator ()(T &data, ContextT &context);
 
 	private:
-		void operator =(const deserializer &other);
+		deserializer(const deserializer &other); // TODO: implement copying if StreamT allows it.
+		void operator =(const deserializer &rhs);
 
 		template <typename T, typename CtxBinderT>
 		void process(T &data, const CtxBinderT &context, arithmetic_type_tag);
@@ -111,18 +113,19 @@ namespace strmd
 	inline void deserializer<StreamT, PackerT, static_version>::process(T &data, const CtxBinderT &context,
 		versioned_user_type_tag)
 	{
-		typedef typename nested_reads_counter< StreamT >::type reads_counter_t;
+		typedef typename get_fragment_reader<StreamT>::type fragment_reader_t;
 
 		if (static_version == unversioned)
 		{
-			unsigned int version_;
-			reads_counter_t r(&_stream);
-			deserializer<reads_counter_t, PackerT> d(r);
+			version_header h;
 
-			(*this)(version_);
-			(*this)(r.remaining);
-			context.serialize_raw(d, data, version_);
-			_stream.skip(r.remaining);
+			(*this)(h);
+
+			fragment_reader_t r(_stream, h.size);
+			deserializer<fragment_reader_t, PackerT> d(r);
+
+			context.serialize_raw(d, data, h.version);
+			r.skip();
 			return;
 		}
 		context.serialize_raw(*this, data, static_cast<unsigned int>(static_version));

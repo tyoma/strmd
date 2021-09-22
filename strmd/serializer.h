@@ -23,7 +23,8 @@
 #include "container.h"
 #include "context.h"
 #include "packer.h"
-#include "stream_counter.h"
+#include "stream_special.h"
+#include "version.h"
 
 namespace strmd
 {
@@ -39,8 +40,11 @@ namespace strmd
 		template <typename T, typename ContextT>
 		void operator ()(const T &data, ContextT &context);
 
+		std::size_t written() const;
+
 	private:
-		void operator =(const serializer &other);
+		serializer(const serializer &other);
+		void operator =(const serializer &rhs);
 
 		template <typename T, typename CtxBinderT>
 		void process(T data, const CtxBinderT &context, arithmetic_type_tag);
@@ -78,6 +82,10 @@ namespace strmd
 	}
 
 	template <typename StreamT, typename PackerT>
+	inline std::size_t serializer<StreamT, PackerT>::written() const
+	{	return _stream.written;	}
+
+	template <typename StreamT, typename PackerT>
 	template <typename T, typename CtxBinderT>
 	inline void serializer<StreamT, PackerT>::process(T data, const CtxBinderT &/*context*/, arithmetic_type_tag)
 	{	PackerT::pack(_stream, data);	}
@@ -96,16 +104,30 @@ namespace strmd
 	inline void serializer<StreamT, PackerT>::process(const T &data, const CtxBinderT &context, user_type_tag)
 	{	context.serialize_raw(*this, const_cast<T &>(data));	}
 
+
+	template <typename StreamT, typename PackerT, typename T, typename CtxBinderT>
+	inline void process_versioned(serializer<StreamT, PackerT> &s, const T &data, const CtxBinderT &context)
+	{
+		writes_counter counter;
+		serializer<writes_counter, PackerT> sc(counter);
+
+		context.serialize_raw(sc, const_cast<T &>(data), version<T>::value);
+		s(version_header::make(version<T>::value, counter.written));
+		context.serialize_raw(s, const_cast<T &>(data), version<T>::value);
+	}
+
+	template <typename PackerT, typename T, typename CtxBinderT>
+	inline void process_versioned(serializer<writes_counter, PackerT> &s, const T &data, const CtxBinderT &context)
+	{
+		const std::size_t written = s.written();
+
+		// Header is normally serialized before the object, but since we're just counting bytes - we don't care.
+		context.serialize_raw(s, const_cast<T &>(data), version<T>::value);
+		s(version_header::make(version<T>::value, s.written() - written));
+	}
+
 	template <typename StreamT, typename PackerT>
 	template <typename T, typename CtxBinderT>
 	inline void serializer<StreamT, PackerT>::process(const T &data, const CtxBinderT &context, versioned_user_type_tag)
-	{
-		writes_counter counter = { };
-		serializer<writes_counter, PackerT> s(counter);
-
-		(*this)(static_cast<unsigned int>(version<T>::value));
-		context.serialize_raw(s, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
-		(*this)(counter.written);
-		context.serialize_raw(*this, const_cast<T &>(data), static_cast<unsigned int>(version<T>::value));
-	}
+	{	process_versioned(*this, data, context);	}
 }

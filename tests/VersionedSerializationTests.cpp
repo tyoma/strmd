@@ -78,8 +78,8 @@ namespace strmd
 				unsigned v = 0;
 				serializer<vector_writer, direct> ser(w);
 
-				A1791 a1791;
-				A190111 a190111;
+				A1791 a1791 = {};
+				A190111 a190111 = {};
 
 				// ACT
 				ser(a1791);
@@ -224,7 +224,7 @@ namespace strmd
 			test( ByteSizeOfASerializedValueAndItselfAreWrittenWithContext )
 			{
 				// INIT
-				unsigned v = 0, ctx;
+				unsigned v = 0, ctx = 123;
 				serializer<vector_writer, varint> ser(w);
 
 				A1791 a = {	};

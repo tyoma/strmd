@@ -26,6 +26,8 @@ namespace strmd
 {
 	struct writes_counter
 	{
+		writes_counter();
+
 		void write(const void *data, std::size_t size);
 
 		std::size_t written;
@@ -33,49 +35,65 @@ namespace strmd
 
 
 	template <typename U>
-	struct reads_counter
+	class fragment_reader
 	{
-		reads_counter(U *underlying);
-		reads_counter(reads_counter *underlying);
+	public:
+		fragment_reader(U &underlying, std::size_t remaining);
+		fragment_reader(fragment_reader &underlying, std::size_t remaining);
 
 		void read(void *data, std::size_t size);
-		void skip(std::size_t size);
+		void skip();
 
-		U *underlying_other;
-		reads_counter *underlying_same;
-		size_t remaining;
+	private:
+		U &skip_recursive_and_get_final(std::size_t d);
+
+	private:
+		U *_underlying_other;
+		fragment_reader *_underlying_same;
+		size_t _remaining;
 	};
 
-	template <typename U> struct nested_reads_counter {	typedef reads_counter<U> type;	};
-	template <typename U> struct nested_reads_counter< reads_counter<U> > {	typedef reads_counter<U> type;	};
+	template <typename U> struct get_fragment_reader {	typedef fragment_reader<U> type;	};
+	template <typename U> struct get_fragment_reader< fragment_reader<U> > {	typedef fragment_reader<U> type;	};
 
 
+
+	inline writes_counter::writes_counter()
+		: written(0)
+	{	}
 
 	inline void writes_counter::write(const void * /*data*/, std::size_t size)
 	{	written += size;	}
 
 
 	template <typename U>
-	inline reads_counter<U>::reads_counter(U *underlying)
-		: underlying_other(underlying), underlying_same(0)
+	inline fragment_reader<U>::fragment_reader(U &underlying, std::size_t remaining)
+		: _underlying_other(&underlying), _underlying_same(0), _remaining(remaining)
 	{	}
 
 	template <typename U>
-	inline reads_counter<U>::reads_counter(reads_counter *underlying)
-		: underlying_other(0), underlying_same(underlying)
+	inline fragment_reader<U>::fragment_reader(fragment_reader &underlying, std::size_t remaining)
+		: _underlying_other(0), _underlying_same(&underlying), _remaining(remaining)
 	{	}
 
 	template <typename U>
-	inline void reads_counter<U>::read(void *data, std::size_t size)
+	inline void fragment_reader<U>::read(void *data, std::size_t size)
+	{	skip_recursive_and_get_final(size).read(data, size);	}
+
+	template <typename U>
+	inline void fragment_reader<U>::skip()
 	{
-		underlying_other ? underlying_other->read(data, size) : underlying_same->read(data, size);
-		remaining -= size;
+		const std::size_t r = _remaining;
+		skip_recursive_and_get_final(r).skip(r);
 	}
 
 	template <typename U>
-	inline void reads_counter<U>::skip(std::size_t size)
+	U &fragment_reader<U>::skip_recursive_and_get_final(std::size_t d)
 	{
-		underlying_other ? underlying_other->skip(size) : underlying_same->skip(size);
-		remaining -= size;
+		fragment_reader *i = this;
+
+		for (i->_remaining -= d; i->_underlying_same; i->_remaining -= d)
+			i = i->_underlying_same;
+		return *i->_underlying_other;
 	}
 }

@@ -42,10 +42,13 @@
     <ClInclude Include="..\strmd\utility.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\strmd\stream_counter.h">
+    <ClInclude Include="..\strmd\context.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\strmd\context.h">
+    <ClInclude Include="..\strmd\version.h">
+      <Filter>Library Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\strmd\stream_special.h">
       <Filter>Library Headers</Filter>
     </ClInclude>
   </ItemGroup>
