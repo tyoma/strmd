@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
 
-include(utee-test)
-
 set(STRMD_TEST_SOURCES
 	ContainerDeserializationTests.cpp
 	CrossSerializationTests.cpp
